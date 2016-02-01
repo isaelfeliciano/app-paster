@@ -1,0 +1,4 @@
+- Implemetar Qr encoder(server)
+- Implemetar Qr decoder(cliente)
+- Subir a github
+

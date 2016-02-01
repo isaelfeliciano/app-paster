@@ -1,0 +1,10 @@
+<input type="text" name="device-desp" placeholder="Device description">
+<input type="text" name="room" placeholder="Room" value="757704ca-28a2-48e0-8a79-c6d02e7486e3">
+<button name="add-devide" ng-click="addDevice()">Add Device</button>
+<textarea name="textarea"></textarea>
+<button name="send-test-room" ng-click="sendTextToRoom()">Send To Room</button>
+<button name="socket-status" ng-click="socketStatus()">Socket Status</button>
+<br>
+<div id="qrcode"></div>
+<button name="join-others" ng-click="joinOthers()">Join Others</button>
+<ul id="log-list"></ul>

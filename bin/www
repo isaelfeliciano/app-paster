@@ -3,17 +3,29 @@
 /**
  * Module dependencies.
  */
-
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 var app = require('../app');
 var debug = require('debug')('remote-paster:server');
+var https = require('https');
 var http = require('http');
+var fs = require('fs');
+
+var rmkey = fs.readFileSync('remotepaster-key.pem');
+var rmcert = fs.readFileSync('remotepaster-cert.pem');
+
+var options = {
+  key: rmkey,
+  cert: rmcert
+};
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '3333');
 app.set('port', port);
+
+// var server = https.createServer(options, app);
 
 /**
  * Create HTTP server.
@@ -87,4 +99,5 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+  console.log('Http server listening *:'+port);
 }
