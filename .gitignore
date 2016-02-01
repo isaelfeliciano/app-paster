@@ -2,3 +2,7 @@ node_modules
 npm-debug.log
 logs/*.log
 git-info.txt 
+cert-file.crt
+certrequest.csr
+remotepaster-cert.pem
+remotepaster-key.pem
