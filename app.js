@@ -20,13 +20,18 @@ var options = {
   key: rmkey,
   cert: rmcert
 };
-
+var socket_io = require('socket.io');
 var app = express();
+var io = socket_io();
+app.io = io;
+var p2p = require('socket.io-p2p-server').Server;
+io.use(p2p);
 
-// var myhttp = require('http').Server(app);
-var io = require('socket.io')({
+
+/*var io = require('socket.io')({
   'close timeout': 606024
-}).listen(3334);
+}, server);
+io.use(p2pserver);*/
 io.on('connection', function(socket){
   console.log('Socket connected: '+socket.id)
   var firstTime = false;
@@ -56,7 +61,7 @@ io.on('connection', function(socket){
     // socketLocalStorage[data.room][desc] = this.id;
     var devices = socketLocalStorage[data.room]['devices'];
     devices = Object.keys(storageByDesc);
-    console.log(devices);
+    console.log('devices: '+devices);
 
     var devicesArrayOfObj = socketLocalStorage[data.room]['devicesArrayOfObj']; 
     devicesArrayOfObj.push(storageByDesc);
@@ -102,7 +107,8 @@ io.on('connection', function(socket){
     thisRoom = Object.keys(thisRoom)[0];
     console.log('User disconnected: '+ id + ' from this room: '+ thisRoom);
     io.to(thisRoom).emit('user-disconnected', {id: id}, {});
-    socketLocalStorage.update(_socket);
+    if (thisRoom !== undefined) 
+      socketLocalStorage.update(_socket);
   });
 });
 

@@ -6,3 +6,4 @@ cert-file.crt
 certrequest.csr
 remotepaster-cert.pem
 remotepaster-key.pem
+new-style

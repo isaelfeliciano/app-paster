@@ -1,25 +1,263 @@
-body {
-  padding: 0px 10px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+*{
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+body, html
+{
+	background: #08327D;
+	padding: 0 1em 1em 1em;
+  height: 100%;
+  overflow: hidden;
+}
+a {
+  color: #558a86;
 }
 
-a {
-  color: #00B7FF;
+.header
+{
+  position: absolute;
+  margin-top: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3em;
+  background-color: white;
+  vertical-align: center;
 }
-#container {
-    margin: 0px auto;
-    width: 500px;
-    height: 375px;
-    border: 10px #333 solid;
+
+.header h2
+{
+  position: relative;
+  top: 1em;
+  padding-left: 0.5em;
 }
-#videoElement {
-    width: 500px;
-    height: 375px;
-    background-color: #666;
+
+.main-container
+{
+  height: 100%;
 }
-#qrcode {
-	/*height: 300px;*/
+
+.dropdown-container
+{
+  position: relative;
+  width: 200px;
+  margin: 0 auto;
+  padding: 10px;
+  top: 3.5em;
+  
+  background: #27FFEF;
+  border-radius: 7px;
+  border: 1px solid rgba(0,0,0,0.15);
+  box-shadow: 0 1px 1px rgba(50, 50, 50, 0.1);
+  cursor: pointer;
+  outline: none;
+  
+  font-weight: bold;
+  color: #fff;
+  z-index: 9;
 }
+.dropdown-container:hover
+{
+  background: #08327D;
+  border: 1px solid #08327D;
+  
+  -webkit-box-shadow: 1px 6px 15px 2px rgba(0,0,0,0.75);
+  -moz-box-shadow: 1px 6px 15px 2px rgba(0,0,0,0.75);
+  box-shadow: 1px 6px 15px 2px rgba(0,0,0,0.75);
+}
+.dropdown-container .dropdown
+{
+  position: absolute;
+  top: 90%;
+  left: 0;
+  right: 0;
+  
+  background: #fff;
+  border-radius: inherit;
+  border: 1px solid rgba(0,0,0,0.17);
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  font-weight: normal;
+  transition: all 0.5s ease-in;
+  list-style: none;
+  
+  opacity: 0;
+  pointer-events: none;
+  color: #08327D;
+}
+.dropdown-container.active .dropdown 
+{
+  opacity: 1;
+  pointer-events: auto;
+}
+.dropdown-container span i
+{
+  position: absolute;
+  right: 0.5em;
+}
+.list-el
+{
+  position: relative;
+  left: -1.8em;
+  
+  padding : 0.2em 0;
+  text-align: left;
+}
+.list-el:hover
+{
+  color: aqua;
+}
+.list-el.selected:after
+{
+  font-family: FontAwesome;
+  content: "\f00c";
+  position: absolute;
+  right: -1.5em;
+}
+
+.message-box-container
+{
+	position: absolute;
+  margin-top: 4em;
+  bottom: 64%;
+  width: 90%;
+	border: 0.3em solid #27FFEF;
+}
+.message-box
+{
+	background: rgba(255, 255, 255, 0.2);
+  /*height: 15%;*/
+	padding: 0.3em 0.15em;
+}
+.message-box p
+{
+	color: rgb(255, 255, 255);
+	/*height: 100%;*/
+}
+
+.text-to-send
+{
+	height: 50%;
+  bottom: 10em;
+}
+
+.textarea-container
+{
+	position: relative;
+	height: 100%;
+}
+.textarea-container .buttons{
+	display: none;
+}
+textarea
+{
+	color: white;
+	text-align: left;
+	display: block; 
+	box-sizing: padding-box; 
+	overflow: scroll; 
+	resize: none; 
+	padding: 3px; 
+	background-color: #08327d;	
+	border-top: 1px solid #08327d; 
+	border-left: 1px solid #08327d; 
+	border-right: 1px solid #08327d;	
+	border-bottom: 2px solid #27FFEF; 
+	height: auto; 
+	min-height: auto;
+	max-height: 75%;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin-bottom: 5px;
+	width: 80%;
+	font-size: 1.5em; 
+}
+
+
+.round-button
+{
+	width: 4em;
+	height: 4em;
+	border-radius: 50%;
+	background: #08327D;
+	border: solid #08327D;
+  position: relative;
+  display: inline-block;
+}
+.round-button:hover
+{
+	background: #08327D;
+	border: solid #27FFEF;
+	cursor: pointer;
+}
+.buttons-container{
+	width: 9.5em;
+	height: 5em;
+}
+.buttons-container .buttons a, .textarea-container .buttons a{
+	background: #27FFEF;
+	margin: 1px;
+	color: #08327D;
+}
+.buttons-container .buttons a:hover, 
+.buttons-container .buttons a:active,
+.textarea-container .buttons a:hover, 
+.textarea-container .buttons a:active{
+	background: #08327D;
+	margin: 1px;
+	color: #27FFEF;
+}
+.buttons a i
+{
+  position: relative;
+  top: 25%;
+}
+.bt-send-attach
+{
+  bottom: 5em;
+}
+.plus-button
+{
+  bottom: 0;
+}
+.modal-btn-container
+{
+  width: 100%;
+  position: absolute;
+  bottom: 60px;
+}
+.square-button
+{
+  width: 300px;
+  background: #08327D;
+  position: absolute;
+  color: #FFF;
+  padding: 0.5em 2em;
+  text-decoration: none;
+  border-radius: 5px;
+  z-index: 10000;
+}
+
+.input-decoration
+{
+	overflow: hidden;
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	position: absolute;
+	z-index: -1;
+}
+.input-decoration + label i
+{
+	width: 100%;
+	height: 100%;
+	font-size: 1.25em;
+	font-weight: 700;
+	display: inline-block;
+}
+
 
 .center
 {
@@ -50,4 +288,104 @@ a {
 
 	height: 100%;
 	vertical-align: middle;
+}
+.center-absolute
+{
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+
+/*Modal-*/
+#modal
+{
+  visibility: hidden;
+  background: rgba(0, 0, 0, 0.7);
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 19999;
+  top: 0;
+  left: 0;
+}
+.modal-dialog
+{
+  position: absolute;
+  border-radius: 10px;
+  top: 25%;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+  height: 60%;
+  background: #FFF;
+  z-index: 9999;
+}
+.modal-container .text-top
+{
+  color: #08327D;
+  font-size: 1.1em;
+}
+#qrcode
+{
+  width: 50%;
+  height: 50%;
+  /*background-image: url(socket-room.png);*/
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.layout-qrcode{
+  top: 25%;
+}
+.box-shadow
+{
+  -webkit-box-shadow: 1px 25px 47px -13px rgba(0,0,0,0.75);
+  -moz-box-shadow: 1px 25px 47px -13px rgba(0,0,0,0.75);
+  box-shadow: 1px 25px 47px -13px rgba(0,0,0,0.75);
+}
+.btn-shadow
+{
+  -webkit-box-shadow: 1px 6px 15px 2px rgba(0,0,0,0.75);
+  -moz-box-shadow: 1px 6px 15px 2px rgba(0,0,0,0.75);
+  box-shadow: 1px 6px 15px 2px rgba(0,0,0,0.75);
+}
+.close
+{
+  color: #08327D;
+}
+/*-Modal*/
+
+@media (max-height: 494px){
+	.dropdown-container{
+		display: none;
+	}
+	.message-box-container{
+		display: none;
+	}
+	.buttons-container .buttons a{
+		display: none;
+	}
+	.text-to-send{
+		bottom: 1em;
+	}
+	.textarea-container .buttons{
+		display: initial;
+		position: absolute;
+		right: 0.5em;
+		width: auto;
+		bottom: 0;
+	}
+	textarea{
+		right: 15%;
+	}
+}
+@media (max-width: 420px){
+	textarea{
+		width: 70%;
+	}
 }

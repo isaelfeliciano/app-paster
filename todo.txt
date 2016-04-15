@@ -1,4 +1,4 @@
 - Implemetar Qr encoder(server)
 - Implemetar Qr decoder(cliente)
-- Subir a github
+- Crear una funcion para obtener status cuando la APP sea visible nuevamente (En Movil)
 

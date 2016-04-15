@@ -1,4 +1,91 @@
 app.controller('MainController', ['$scope', '$http', '$window', function ($scope, $http, $window){
+
+
+	$(document)
+		.one('focus.textarea', '.autoExpand', function(){
+			var savedValue = this.value;
+			this.value = '';
+			this.baseScrollHeight = this.scrollHeight;
+			this.value = savedValue;
+		})
+		.on('input.textarea', '.autoExpand', function(){
+			var minRows = this.getAttribute('data-min-rows')|0,
+				 rows;
+			this.rows = minRows;
+        console.log(this.scrollHeight , this.baseScrollHeight);
+			rows = Math.ceil((this.scrollHeight - this.baseScrollHeight) / 33);
+			this.rows = minRows + rows;
+		});
+
+		// Modal-
+	$scope.modal = function(){
+		el = document.getElementById('modal');
+		el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+		joinOthers();
+	}
+	// -Modal
+	
+	// Dropdown-			
+	function DropDown(el) {
+		this.dd = el;
+		this.placeholder = this.dd.children('span');
+		this.opts = this.dd.find('ul.dropdown > li');
+		this.val = '';
+		this.index = -1;
+		this.initEvents();
+	}
+	DropDown.prototype = {
+		initEvents : function() {
+			var obj = this;
+
+			obj.dd.on('click', function(event){
+				$(this).toggleClass('active');
+				return false;
+			});
+
+			obj.opts.on('click',function(){
+				$(this).toggleClass('selected');
+				var opt = $(this);
+				obj.val = opt.text();
+				obj.index = opt.index();
+										
+				// obj.placeholder.text(obj.val);
+			});
+		},
+		getValue : function() {
+			return this.val;
+		},
+		getIndex : function() {
+			return this.index;
+		}
+	}
+
+	$(function() {
+		var dd = new DropDown( $('#dd') );
+		$(document).click(function() {
+			// all dropdowns
+			$('.dropdown-container').removeClass('active');
+		});
+	});
+	// -Dropdown
+
+	
+	
+	/*var socket = io();
+	var opts = {peerOpts: {trickle: false}, autoUpgrade: false};
+	var socketp2p = new Socketiop2p(socket, opts, function(){
+		p2psocket.emit('peer-obj', 'Hello there. I am ' + p2psocket.peerId);
+	});*/
+
+	// var P2P = require('socket.io-p2p');
+	// var io = require('sock.io-client');
+	var socket = io();
+	var opts = {autoUpgrade: false, peerOpts: {numClients: 10}};
+	var socketp2p = new P2P(socket, opts);
+	socketp2p.on('peer-msg', function(data){
+		console.log('From a peer %s ' + data.text);
+	});
+
 	var list = document.getElementById('log-list');
 	var localStorage = window.localStorage;
 	$(document).foundation();
@@ -11,7 +98,7 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 	else {
     var oReq = new XMLHttpRequest();
     oReq.addEventListener('load', socketStarter);
-    oReq.open('GET', 'http://10.0.0.219:3333/uuid');
+    oReq.open('GET', 'http://192.168.88.219:3333/uuid');
     oReq.send();
   }
 
@@ -22,9 +109,9 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
   		var uuid = data;
   	window.localStorage.setItem('room', uuid);
   	if (true){
-	  	socket = io('http://10.0.0.219:3334/');
-	  	socket.emit('leave-default-room', {});
-	  	socket.emit('joinmeto', {room: uuid, desp: 'desktop'});
+	  	// socketp2p = io('http://192.168.88.219:3333');
+	  	socketp2p.emit('leave-default-room', {});
+	  	socketp2p.emit('joinmeto', {room: uuid, desp: 'desktop'});
 	  	socketOn();
 	  }
   }
@@ -32,7 +119,8 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
   $scope.sendTextToRoom = function(){
   	var text = document.getElementsByName('textarea')[0].value;
   	var room = document.cookie.replace(/(?:(?:^|.*;\s*)room\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-  	socket.emit('to-room', {room: room, text: text});
+  	socketp2p.emit('to-room', {room: room, text: text});
+  	// socketp2p.emit('peer-msg', {room: room, text: text});
   }
 
   function getRoom (){
@@ -43,49 +131,49 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
   }
 
   function socketOn(){
-		socket.on('connect', function(){
+		socketp2p.on('connect', function(){
 			console.log('Event: connect');
 		});
-		socket.on('connect_error', function(){
+		socketp2p.on('connect_error', function(){
 			console.log('Event: connect_error');
 		});
-		socket.on('connect_timeout', function(){
+		socketp2p.on('connect_timeout', function(){
 			console.log('Event: connect_timeout');
 		});
-		socket.on('reconnect', function(){
+		socketp2p.on('reconnect', function(){
 			console.log('Event: reconnect');
 		});
-		socket.on('reconnect_attempt', function(){
+		socketp2p.on('reconnect_attempt', function(){
 			console.log('Event: reconnect_attempt');
 		});
-		socket.on('reconnecting', function(){
+		socketp2p.on('reconnecting', function(){
 			console.log('Event: reconnecting');
 		});
-		socket.on('reconnect_failed', function(){
+		socketp2p.on('reconnect_failed', function(){
 			console.log('Event: reconnect_failed');
 		});
-	  socket.on('message', function(data){
-	  	document.getElementsByName('textarea')[0].value = data.msg;
+	  socketp2p.on('message', function(data){
+	  	document.getElementById('text-received').innerHTML = data.msg;
 	  });
-	  socket.on('reconnect', function(){
-	  	socket.emit('leave-default-room', {});
+	  socketp2p.on('reconnect', function(){
+	  	socketp2p.emit('leave-default-room', {});
 			// var room = document.cookie.replace(/(?:(?:^|.*;\s*)room\s*\=\s*([^;]*).*$)|^.*$/, "$1");
 			var room = getRoom();
-			socket.emit('joinmeto', {room: room, desp: 'desktop'});
+			socketp2p.emit('joinmeto', {room: room, desp: 'desktop'});
 			/*var li = document.createElement('li');
 			var textNode = document.createTextNode('Reconnection');
 			li.appendChild(textNode);
 			list.appendChild(li);*/
 	  });
-	  socket.on('user-disconnected', function(data){
+	  socketp2p.on('user-disconnected', function(data){
 			console.log('Usuario desconectado: '+ data.id);
 			// $("td[socket-id='"+ data.id + "']").parent().remove();
 		});
-		socket.on('joinedToRoom', function(data){
+		socketp2p.on('joinedToRoom', function(data){
 			updateDeviceList(data);
 		});	
 
-		socket.on('updateData', function(data){
+		socketp2p.on('updateData', function(data){
 			updateDeviceList(data);
 		});
 	}
@@ -98,14 +186,14 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 		for(i in data.devicelist){
 			$("td:contains('"+ data.devicelist[i] +"')").attr('socket-id', storageByDesc[data.devicelist[i]]);
 		}
-		$("td[socket-id='"+ socket.id +"']").text('This Device');
+		$("td[socket-id='"+ socketp2p.id +"']").text('This Device');
 	}	
 
 	$scope.addDevice = function(){
 		var desp = document.getElementsByName('device-desp')[0].value;
 		var room = '757704ca-28a2-48e0-8a79-c6d02e7486e3';
 		// var room = document.getElementsByName('room')[0].value;
-		socket.emit('joinmeto', {room: room, desp: desp});
+		socketp2p.emit('joinmeto', {room: room, desp: desp});
 		// document.cookie = "room="+room;
 		// document.cookie = "desp="+desp;
 		window.localStorage.setItem('room', room);
@@ -113,7 +201,8 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 		console.log(window.localStorage.getItem('room'));
 	}
 
-	$scope.joinOthers = function(){
+	joinOthers = function(){
+		$('#qrcode').empty();
 		var room = getRoom();
 		var qrcode = new QRCode('qrcode', {
 			text: room,
@@ -172,7 +261,7 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 		$('#qrcode').empty();
 	});
 
-	if(socket){
-		$("td[socket-id='"+ socket.id +"']").text('This Device');
+	if(socketp2p){
+		$("td[socket-id='"+ socketp2p.id +"']").text('This Device');
 	}
 }]);

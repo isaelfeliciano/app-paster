@@ -9,93 +9,54 @@
 <button name="join-others" ng-click="joinOthers()">Join Others</button>
 <ul id="log-list"></ul> -->
 
-<div class="top-bar">
-	<div class="top-bar-left">
-		<ul class="menu">
-			<li class="menu-text">Remote Paster</li>
-		</ul>
+<div class="main-container">
+	<div class="header">
+		<h2>Remote Paster</h2>
 	</div>
-	<div class="top-bar-right">
-		<ul class="menu">
-			<li><a href="">Home</a></li>
-			<li><a href="">Download</a></li>
-			<li><a href="">About</a></li>
-		</ul>
-	</div>
-</div>
-
-<br>
-
-<div class="first-section">
-	<div class="top-bar">
-		<div class="top-bar-left">
-			<ul class="menu">
-				<li class="menu-text">Devices List</li>
-			</ul>
+	  <div id="dd" class="dropdown-container center" ng-data="devicelist">
+	    <span>Devices: You +{{ devicelist.length - 1}} <i class="fa fa-chevron-down"></i></span>
+	    <ul class="dropdown">
+	      <li class="list-el selected" ng-repeat=" device in devicelist">{{ device }}</li>
+	    </ul>
+	  </div>
+	<div class="message-box-container center-absolute">
+		<div class="message-box">
+			<p id="text-received">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p> 
 		</div>
-		<!-- <div class="top-bar-right">
-			<ul class="menu">
-				<li class="menu-text"><a href=""><i class="fa fa-plus-circle fa-3x"></i></a></li>
-			</ul>
-		</div> -->
 	</div>
-	<div class="row">
-		<table class="pure-table pure-table-horizontal large-12 columns">
-			<thead>
-				<tr>
-					<th>Devices</th>
-					<th>Status</th>
-				</tr>
-			</thead>
-
-			<tbody>
-				<tr ng-repeat="device in devicelist">
-					<td> {{ device }} </td>
-					<td>OK</td>
-				</tr>
-			</tbody>
-		</table>
+	<div class="text-to-send center-absolute">
+		<div class="textarea-container center">
+			<textarea  class="autoExpand center" name="textarea" rows="1" data-min-rows='1' placeholder="Start typing or drag n' drop your files here"></textarea>
+			<div class="buttons">
+			<a href="javascript:void(0)" class="round-button" ng-click="sendTextToRoom()"><i class="fa fa-2x">&#xf1d8;</i></a>
+		</div>
+		</div>
 	</div>
-	<div class="row">
-		<button type="button" class="button large-4 columns">Select All</button>
-		<div class="small-2 columns center"><a href="" ng-click="joinOthers()" data-open="qrmodal"><i class="fa fa-plus-circle fa-3x"></i></a></div>
-		<button type="button" class="button large-4 columns">Reset Selection</button>
+	<div class="buttons-container bt-send-attach center-absolute">
+		<div class="buttons">
+			<a href="javascript:void(0)" class="round-button" ng-click="sendTextToRoom()"><i class="fa fa-2x">&#xf1d8;</i></a>
+			<a href="javascript:void(0)" class="round-button"><i class="fa fa-2x">&#xf0c6;</i></a>
+		</div>
 	</div>
-	<div class="row">
-		<label for="joinToDevice" class="button large-12 columns">Join to other device</label>
-		<input type="file" id="joinToDevice" class="show-for-sr" custom-on-change="uploadFile">
+	<div class="buttons-container plus-button center-absolute">
+		<div class="buttons">
+			<a href="javascript:void(0)" class="round-button " ng-click="modal()"><i class="fa fa-2x">&#xf067;</i></a>
+		</div>
 	</div>
-	<canvas id="qr-canvas" hidden="hidden"></canvas>
-</div>
-
-<br>
-
-<div class="callout-section">
-	
-</div>
-
-<div class="second-section">
-	<textarea name="textarea" rows="5" placeholder="Type or paste something here"></textarea>
-	<div class="row">
-		<button type="button" class="button large-12 columns" ng-click="sendTextToRoom()"><i class="fa fa-send">  Send Text</i></button>
-		<!-- <div class="small-2 columns"></div> -->
+	<div id="modal" class="modal-container">
+	  <div id="open-modal" class="modal-dialog box-shadow center">
+	    <a href="javascript:void(0)" title="Close" class="close" ng-click="modal()"><i class="fa fa-times fa-3x"></i></a>
+	    <div class="modal-main-container">
+	      <p class="text-top">Scan the QR to start sharing with this device</p>
+	      <div id="qrcode" class="layout-qrcode center-absolute"></div>
+	    </div>
+	    <div class="modal-btn-container">
+	      <input type="file" class="square-button btn-shadow center-absolute" custom-on-change="uploadFile" value="Scan other device QR Code"/>
+	    </div>
+	  </div>
 	</div>
-	<div class="row">
-		<label for="upLoadFile" class="button large-12 columns"><i class="fa fa-upload">  Upload File</i></label>
-		<input type="file" id="upLoadFile" class="show-for-sr">
-	</div>
-</div>
-
-<div class="tiny reveal center" id="qrmodal" data-reveal>
-	<div id="qrcode" class="center"></div>
 </div>
 
 <canvas id="qr-canvas" style="display:none;">
 	
 </canvas>
-
-<ul>
-	<li ng-repeat="device in devicelist">
-		{{ device }}
-	</li>
-</ul>
