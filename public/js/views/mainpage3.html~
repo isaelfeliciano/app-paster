@@ -1,0 +1,81 @@
+<!-- <input type="text" name="device-desp" placeholder="Device description">
+<input type="text" name="room" placeholder="Room" value="757704ca-28a2-48e0-8a79-c6d02e7486e3">
+<button name="add-devide" ng-click="addDevice()">Add Device</button>
+<textarea name="textarea"></textarea>
+<button name="send-test-room" ng-click="sendTextToRoom()">Send To Room</button>
+<button name="socket-status" ng-click="socketStatus()">Socket Status</button>
+<br>
+<div id="qrcode"></div>
+<button name="join-others" ng-click="joinOthers()">Join Others</button>
+<ul id="log-list"></ul> -->
+
+<div class="top-bar">
+	<h2>Remote Paster</h2>
+</div>
+
+<br>
+
+<div class="first-section">
+	<div class="top-ba">
+		<div class="top-bar-left">
+			<ul class="menu">
+				<li class="menu-text">Devices List</li>
+			</ul>
+		</div>
+		<!-- <div class="top-bar-right">
+			<ul class="menu">
+				<li class="menu-text"><a href=""><i class="fa fa-plus-circle fa-3x"></i></a></li>
+			</ul>
+		</div> -->
+	</div>
+	<div class="row">
+		<table class="pure-table pure-table-horizontal large-12 columns">
+			<thead>
+				<tr>
+					<th>Devices</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				<tr ng-repeat="device in devicelist">
+					<td> {{ device }} </td>
+					<td>OK</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="row">
+
+	</div>
+	<canvas id="qr-canvas" hidden="hidden"></canvas>
+</div>
+
+<br>
+
+<div class="callout-section">
+	
+</div>
+
+<div class="second-section center">
+	<div class="textarea-container center">
+		<textarea  class="autoExpand textarea-custom center" name="textarea" rows="1" data-min-rows='1' placeholder="Type your text or drag n' drop your files here"></textarea>
+	</div>
+	<div class="row">
+		<button type="button" class="round-button large-12 columns" ng-click="sendTextToRoom()"><i class="fa fa-send"></i></button>
+
+		<!-- <input type="file" id="upLoadFile" class="show-for-sr input-decoration">
+		<label for="upLoadFile" class="round-button"><span>&#xf048;</span></label> -->
+		<!-- <div class="small-2 columns"></div> -->
+	</div>
+</div>
+
+<span>&#xf048;</span>
+
+<div class="tiny reveal center" id="qrmodal" data-reveal>
+	<div id="qrcode" class="center"></div>
+</div>
+
+<canvas id="qr-canvas" style="display:none;">
+	
+</canvas>

@@ -1,0 +1,101 @@
+<!-- <input type="text" name="device-desp" placeholder="Device description">
+<input type="text" name="room" placeholder="Room" value="757704ca-28a2-48e0-8a79-c6d02e7486e3">
+<button name="add-devide" ng-click="addDevice()">Add Device</button>
+<textarea name="textarea"></textarea>
+<button name="send-test-room" ng-click="sendTextToRoom()">Send To Room</button>
+<button name="socket-status" ng-click="socketStatus()">Socket Status</button>
+<br>
+<div id="qrcode"></div>
+<button name="join-others" ng-click="joinOthers()">Join Others</button>
+<ul id="log-list"></ul> -->
+
+<div class="top-bar">
+	<div class="top-bar-left">
+		<ul class="menu">
+			<li class="menu-text">Remote Paster</li>
+		</ul>
+	</div>
+	<div class="top-bar-right">
+		<ul class="menu">
+			<li><a href="">Home</a></li>
+			<li><a href="">Download</a></li>
+			<li><a href="">About</a></li>
+		</ul>
+	</div>
+</div>
+
+<br>
+
+<div class="first-section">
+	<div class="top-bar">
+		<div class="top-bar-left">
+			<ul class="menu">
+				<li class="menu-text">Devices List</li>
+			</ul>
+		</div>
+		<!-- <div class="top-bar-right">
+			<ul class="menu">
+				<li class="menu-text"><a href=""><i class="fa fa-plus-circle fa-3x"></i></a></li>
+			</ul>
+		</div> -->
+	</div>
+	<div class="row">
+		<table class="pure-table pure-table-horizontal large-12 columns">
+			<thead>
+				<tr>
+					<th>Devices</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				<tr ng-repeat="device in devicelist">
+					<td> {{ device }} </td>
+					<td>OK</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="row">
+		<button type="button" class="button large-4 columns">Select All</button>
+		<div class="small-2 columns center"><a href="" ng-click="joinOthers()" data-open="qrmodal"><i class="fa fa-plus-circle fa-3x"></i></a></div>
+		<button type="button" class="button large-4 columns">Reset Selection</button>
+	</div>
+	<div class="row">
+		<label for="joinToDevice" class="button large-12 columns">Join to other device</label>
+		<input type="file" id="joinToDevice" class="show-for-sr" custom-on-change="uploadFile">
+	</div>
+	<canvas id="qr-canvas" hidden="hidden"></canvas>
+</div>
+
+<br>
+
+<div class="callout-section">
+	
+</div>
+
+<div class="second-section">
+	<textarea class="custom-textarea" name="textarea" rows="5" placeholder="Type or paste something here"></textarea>
+	<div class="row">
+		<button type="button" class="button large-12 columns" ng-click="sendTextToRoom()"><i class="fa fa-send">  Send Text</i></button>
+		<!-- <div class="small-2 columns"></div> -->
+	</div>
+	<div class="row">
+		<label for="upLoadFile" class="button large-12 columns"><i class="fa fa-upload">  Upload File</i></label>
+		<input type="file" id="upLoadFile" class="show-for-sr">
+	</div>
+</div>
+
+<div class="tiny reveal center" id="qrmodal" data-reveal>
+	<div id="qrcode" class="center"></div>
+</div>
+
+<canvas id="qr-canvas" style="display:none;">
+	
+</canvas>
+
+<ul>
+	<li ng-repeat="device in devicelist">
+		{{ device }}
+	</li>
+</ul>
