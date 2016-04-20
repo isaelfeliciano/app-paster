@@ -1,5 +1,7 @@
 app.controller('MainController', ['$scope', '$http', '$window', function ($scope, $http, $window){
 
+	var ip_address = '192.168.254.159';
+
 
 	$(document)
 		.one('focus.textarea', '.autoExpand', function(){
@@ -122,7 +124,7 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 	else {
     var oReq = new XMLHttpRequest();
     oReq.addEventListener('load', socketStarter);
-    oReq.open('GET', 'http://192.168.88.219:3333/uuid');
+    oReq.open('GET', 'http://'+ip_address+':3333/uuid');
     oReq.send();
   }
 
