@@ -19,10 +19,34 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 
 		// Modal-
 	$scope.modal = function(){
+		var timeout;
+		var isHidden = false;
 		el = document.getElementById('modal');
 		el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
 		joinOthers();
-	}
+
+		document.addEventListener("mousemove", hideMouse);
+		function hideMouse(){
+			if (timeout){
+				clearTimeout(timeout);
+			}
+			timeout = setTimeout(function(){
+				if (!isHidden){
+					$(".close, .text-top, .modal-btn-container")
+						.toggleClass('notVisible');
+					$("body").toggleClass('notMouse');	
+					isHidden = true;
+				}
+			}, 2000);
+			if (isHidden){
+				$(".close, .text-top, .modal-btn-container")
+						.toggleClass('notVisible');
+				$("body").toggleClass('notMouse');	
+				isHidden = false;
+			}
+		};
+	};
+
 	// -Modal
 	
 	// Dropdown-			
@@ -118,8 +142,9 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 
   $scope.sendTextToRoom = function(){
   	var text = document.getElementsByName('textarea')[0].value;
-  	var room = document.cookie.replace(/(?:(?:^|.*;\s*)room\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-  	socketp2p.emit('to-room', {room: room, text: text});
+  	// var room = document.cookie.replace(/(?:(?:^|.*;\s*)room\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+  	var room = getRoom();
+  	socketp2p.emit('to-room', {room: room, text: text, id: getSocketId()});
   	// socketp2p.emit('peer-msg', {room: room, text: text});
   }
 
@@ -130,9 +155,17 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
   	}
   }
 
+  function getSocketId (){
+  	if (localStorage.getItem('socketId')){
+  		var socketId;
+  		return socketId = localStorage.getItem('socketId');
+  	}
+  }
+
   function socketOn(){
 		socketp2p.on('connect', function(){
 			console.log('Event: connect');
+			window.localStorage.setItem('socketId', socket.id);
 		});
 		socketp2p.on('connect_error', function(){
 			console.log('Event: connect_error');
@@ -154,6 +187,9 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 		});
 	  socketp2p.on('message', function(data){
 	  	document.getElementById('text-received').innerHTML = data.msg;
+	  	$scope.sender = data.sender;
+	  	$scope.$apply();
+	  	$('.layout-message').removeClass('notVisible');
 	  });
 	  socketp2p.on('reconnect', function(){
 	  	socketp2p.emit('leave-default-room', {});

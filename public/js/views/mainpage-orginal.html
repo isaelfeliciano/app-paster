@@ -1,0 +1,62 @@
+<!-- <input type="text" name="device-desp" placeholder="Device description">
+<input type="text" name="room" placeholder="Room" value="757704ca-28a2-48e0-8a79-c6d02e7486e3">
+<button name="add-devide" ng-click="addDevice()">Add Device</button>
+<textarea name="textarea"></textarea>
+<button name="send-test-room" ng-click="sendTextToRoom()">Send To Room</button>
+<button name="socket-status" ng-click="socketStatus()">Socket Status</button>
+<br>
+<div id="qrcode"></div>
+<button name="join-others" ng-click="joinOthers()">Join Others</button>
+<ul id="log-list"></ul> -->
+
+<div class="main-container">
+	<div class="header">
+		<h2>Remote Paster</h2>
+	</div>
+	  <div id="dd" class="dropdown-container center" ng-data="devicelist">
+	    <span>Devices: You +{{ devicelist.length - 1}} <i class="fa fa-chevron-down"></i></span>
+	    <ul class="dropdown">
+	      <li class="list-el selected" ng-repeat=" device in devicelist">{{ device }}</li>
+	    </ul>
+	  </div>
+	<div class="message-box-container center-absolute">
+		<div class="message-box">
+			<p id="text-received">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p> 
+		</div>
+	</div>
+	<div class="text-to-send center-absolute">
+		<div class="textarea-container center">
+			<textarea  class="autoExpand center" name="textarea" rows="1" data-min-rows='1' placeholder="Start typing or drag n' drop your files here"></textarea>
+			<div class="buttons">
+			<a href="javascript:void(0)" class="round-button" ng-click="sendTextToRoom()"><i class="fa fa-2x">&#xf1d8;</i></a>
+		</div>
+		</div>
+	</div>
+	<div class="buttons-container bt-send-attach center-absolute">
+		<div class="buttons">
+			<a href="javascript:void(0)" class="round-button" ng-click="sendTextToRoom()"><i class="fa fa-2x">&#xf1d8;</i></a>
+			<a href="javascript:void(0)" class="round-button"><i class="fa fa-2x">&#xf0c6;</i></a>
+		</div>
+	</div>
+	<div class="buttons-container plus-button center-absolute">
+		<div class="buttons">
+			<a href="javascript:void(0)" class="round-button " ng-click="modal()"><i class="fa fa-2x">&#xf067;</i></a>
+		</div>
+	</div>
+	<div id="modal" class="modal-container">
+	  <div id="open-modal" class="modal-dialog box-shadow center">
+	    <a href="javascript:void(0)" title="Close" class="close" ng-click="modal()"><i class="fa fa-times fa-3x"></i></a>
+	    <div class="modal-main-container">
+	      <p class="text-top">Scan the QR to start sharing with this device</p>
+	      <div id="qrcode" class="layout-qrcode center-absolute"></div>
+	    </div>
+	    <div class="modal-btn-container">
+	      <input type="file" class="square-button btn-shadow center-absolute" custom-on-change="uploadFile" value="Scan other device QR Code"/>
+	    </div>
+	  </div>
+	</div>
+</div>
+
+<canvas id="qr-canvas" style="display:none;">
+	
+</canvas>

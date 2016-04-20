@@ -1,3 +1,9 @@
+console.logIt = function(str){
+  console.log("BEGIN----");
+  console.log(str);
+  console.log("----END");
+  }
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -33,7 +39,7 @@ io.use(p2p);
 }, server);
 io.use(p2pserver);*/
 io.on('connection', function(socket){
-  console.log('Socket connected: '+socket.id)
+  console.logIt('Socket connected: '+socket.id)
   var firstTime = false;
   if (socket.handshake.headers.cookie){
     firstTime = true;
@@ -61,17 +67,17 @@ io.on('connection', function(socket){
     // socketLocalStorage[data.room][desc] = this.id;
     var devices = socketLocalStorage[data.room]['devices'];
     devices = Object.keys(storageByDesc);
-    console.log('devices: '+devices);
+    console.logIt('devices: '+devices);
 
     var devicesArrayOfObj = socketLocalStorage[data.room]['devicesArrayOfObj']; 
     devicesArrayOfObj.push(storageByDesc);
-    console.log('devicesArrayOfObj: ');
-    console.log(devicesArrayOfObj);
+    console.logIt('devicesArrayOfObj: ');
+    console.logIt(devicesArrayOfObj);
     // devices.push({dev: desc});
-    console.log(this.id+ ' room: '+data.room);
+    console.logIt(this.id+ ' room: '+data.room);
     var room = io.sockets.adapter.rooms[data.room];
-    console.log(Object.keys(room));
-    console.log(socketLocalStorage);
+    console.logIt(Object.keys(room));
+    console.logIt(socketLocalStorage);
     this.broadcast.to(data.room).emit('joinedToRoom', {
       devicelist: devices,
       objDevices: socketLocalStorage[data.room],
@@ -89,15 +95,18 @@ io.on('connection', function(socket){
     var thisRoom = Object.keys(this.adapter.rooms)[0];
     var clientsInRoom = this.adapter.rooms[thisRoom];
     var clientsInRoomArray = [];
-    this.broadcast.to(thisRoom).emit('message', {msg: data.text});
-    console.log('send to room');
+    this.broadcast.to(thisRoom).emit('message', {
+      msg: data.text,
+      sender: socketLocalStorage[thisRoom].storageBySocket[data.id]
+    });
+    console.logIt('send to room');
     for (client in clientsInRoom) {
       clientsInRoomArray.push(client);
     }
     /*for (var i = 0; i = clientsInRoomArray.length; i++){
 
     }*/
-    console.log(clientsInRoomArray);
+    console.logIt(clientsInRoomArray);
   });
 
   socket.on('disconnect', function(){
@@ -105,7 +114,7 @@ io.on('connection', function(socket){
     var thisRoom = this.adapter.rooms;
     var id = this.id;
     thisRoom = Object.keys(thisRoom)[0];
-    console.log('User disconnected: '+ id + ' from this room: '+ thisRoom);
+    console.logIt('User disconnected: '+ id + ' from this room: '+ thisRoom);
     io.to(thisRoom).emit('user-disconnected', {id: id}, {});
     if (thisRoom !== undefined) 
       socketLocalStorage.update(_socket);
@@ -115,11 +124,11 @@ io.on('connection', function(socket){
 socketLocalStorage.update = function(_socket){
   var room = _socket.adapter.rooms;
   room = Object.keys(room)[0];
-  console.log(room);
+  console.logIt(room);
   var desc = socketLocalStorage[room]['storageBySocket'][_socket.id];
   delete socketLocalStorage[room]['storageBySocket'][_socket.id];
   delete socketLocalStorage[room]['storageByDesc'][desc];
-  console.log(socketLocalStorage);
+  console.logIt(socketLocalStorage);
   var storageByDesc = socketLocalStorage[room]['storageByDesc'];
   // storageByDesc[desc] = _socket.id;
   // var storageBySocket = socketLocalStorage[room]['storageBySocket'];
@@ -144,7 +153,7 @@ socketLocalStorage.update = function(_socket){
   });*/
 
 /*myhttp.listen(3334, function(){
-  console.log('Http server listening on *:3334');
+  console.logIt('Http server listening on *:3334');
 });*/
 
 // view engine setup
