@@ -2,4 +2,5 @@
 - Implemetar Qr decoder(cliente)
 - Crear una funcion para obtener status cuando la APP sea visible nuevamente (En Movil)
 - Mejorar o cambiar la forma en que se lee el codigo QR
+- Implementar Flash Messages
 

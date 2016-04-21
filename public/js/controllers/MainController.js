@@ -1,6 +1,6 @@
 app.controller('MainController', ['$scope', '$http', '$window', function ($scope, $http, $window){
 
-	var ip_address = '192.168.254.159';
+	var ip_address = '192.168.88.219';
 
 
 	$(document)
@@ -95,6 +95,19 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 	});
 	// -Dropdown
 
+	// Flash Message
+	function flashMessage(msg){
+		if(hideFlashMessage)
+			clearTimeout(hideFlashMessage);
+		$('.flashmessage').removeClass('notVisible')
+		.html('<p>'+msg+'</p>');
+		var hideFlashMessage = setTimeout(function(){
+			$('.flashmessage').addClass('notVisible').
+			html('');
+		}, 3000);
+	}
+	// Flash Message
+
 	
 	
 	/*var socket = io();
@@ -166,7 +179,7 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 
   function socketOn(){
 		socketp2p.on('connect', function(){
-			console.log('Event: connect');
+			flashMessage('Event: connect');
 			window.localStorage.setItem('socketId', socket.id);
 		});
 		socketp2p.on('connect_error', function(){
@@ -273,13 +286,13 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 			ctx.drawImage(img, 0,0);
 			canvas.toDataURL("image/png");
 			qrcode.decode(fr.result);
-			qrcode.callback = function(a){
-			console.log(a);
-			socketStarter(a);
-			// var li = document.createElement('li');
-			// var textNode = document.createTextNode(a);
-			// li.appendChild(textNode);
-			// list.appendChild(li);
+			qrcode.callback = function(data){
+			console.log(data);
+			if (data === 'error decoding QR Code'){
+				flashMessage(data);
+			}else {
+				socketStarter(data);
+			}
 		}
 			// $('#reader').css({'background-image': 'url('+fr.result+')'});
 			/*$('#reader').html5_qrcode(function (data){
