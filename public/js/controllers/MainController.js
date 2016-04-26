@@ -2,6 +2,67 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 
 	var ip_address = '192.168.88.219';
 
+	/*Test QR code scan*/
+/*	(function() {
+	  var streaming = false,
+	      video        = document.querySelector('#video'),
+	      cover        = document.querySelector('#cover'),
+	      canvas       = document.querySelector('#canvas'),
+	      photo        = document.querySelector('#photo'),
+	      startbutton  = document.querySelector('#startbutton'),
+	      width = 200,
+	      height = 0;
+
+	  navigator.getMedia = ( navigator.getUserMedia || 
+	                         navigator.webkitGetUserMedia ||
+	                         navigator.mozGetUserMedia ||
+	                         navigator.msGetUserMedia);
+
+	  navigator.getMedia(
+	    { 
+	      video: true, 
+	      audio: false 
+	    },
+	    function(stream) {
+	      if (navigator.mozGetUserMedia) { 
+	        video.mozSrcObject = stream;
+	      } else {
+	        var vendorURL = window.URL || window.webkitURL;
+	        video.src = vendorURL ? vendorURL.createObjectURL(stream) : stream;
+	      }
+	      video.play();
+	    },
+	    function(err) {
+	      console.log("An error occured! " + err);
+	    }
+	  );
+
+	  video.addEventListener('canplay', function(ev){
+	    if (!streaming) {
+	      height = video.videoHeight / (video.videoWidth/width);
+	      video.setAttribute('width', width);
+	      video.setAttribute('height', height);
+	      canvas.setAttribute('width', width);
+	      canvas.setAttribute('height', height);
+	      streaming = true;
+	    }
+	  }, false);
+
+	  function takepicture() {
+	    canvas.width = width;
+	    canvas.height = height;
+	    canvas.getContext('2d').drawImage(video, 0, 0, width, height);
+	    var data = canvas.toDataURL('image/png');
+	    photo.setAttribute('src', data);
+	  }
+
+	  startbutton.addEventListener('click', function(ev){
+	      takepicture();
+	    ev.preventDefault();
+	  }, false);
+
+	})();*/
+	/*Test QR code scan*/
 
 	$(document)
 		.one('focus.textarea', '.autoExpand', function(){
@@ -149,8 +210,9 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
   	window.localStorage.setItem('room', uuid);
   	if (true){
 	  	// socketp2p = io('http://192.168.88.219:3333');
+	  	var deviceId = localStorage.getItem('device-id');
 	  	socketp2p.emit('leave-default-room', {});
-	  	socketp2p.emit('joinmeto', {room: uuid, desp: 'desktop'});
+	  	socketp2p.emit('joinmeto', {room: uuid, desp: 'desktop', deviceId: deviceId});
 	  	socketOn();
 	  }
   }
@@ -159,7 +221,7 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
   	var text = document.getElementsByName('textarea')[0].value;
   	// var room = document.cookie.replace(/(?:(?:^|.*;\s*)room\s*\=\s*([^;]*).*$)|^.*$/, "$1");
   	var room = getRoom();
-  	socketp2p.emit('to-room', {room: room, text: text, id: getSocketId()});
+  	socketp2p.emit('to-room', {room: room, text: text, id: getDeviceId()});
   	// socketp2p.emit('peer-msg', {room: room, text: text});
   }
 
@@ -177,11 +239,20 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
   	}
   }
 
+  function getDeviceId (){
+  	return localStorage.getItem('device-id');
+  }
+
   function socketOn(){
 		socketp2p.on('connect', function(){
 			flashMessage('Event: connect');
-			window.localStorage.setItem('socketId', socket.id);
+			localStorage.setItem('socketId', socket.id);
+			if (!localStorage.getItem('device-id'))
+				socketp2p.emit('get-device-id');
 		});
+		socketp2p.on('device-id', function(data){
+			localStorage.setItem('device-id', data);
+		})
 		socketp2p.on('connect_error', function(){
 			console.log('Event: connect_error');
 		});
@@ -210,7 +281,8 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 	  	socketp2p.emit('leave-default-room', {});
 			// var room = document.cookie.replace(/(?:(?:^|.*;\s*)room\s*\=\s*([^;]*).*$)|^.*$/, "$1");
 			var room = getRoom();
-			socketp2p.emit('joinmeto', {room: room, desp: 'desktop'});
+			var deviceId = localStorage.getItem('device-id');
+			socketp2p.emit('joinmeto', {room: room, desp: 'desktop', deviceId: deviceId});
 			/*var li = document.createElement('li');
 			var textNode = document.createTextNode('Reconnection');
 			li.appendChild(textNode);
@@ -230,21 +302,21 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 	}
 
 	function updateDeviceList(data){
-		$scope.devicelist = data.devicelist;
+		var deviceId = localStorage.getItem('device-id');
+		var devicelist = data.devicelist;
+		var index = devicelist.indexOf(deviceId);
+		// devicelist.splice(index, 1);
+		$scope.devicelist = devicelist;
 		console.log($scope.devicelist);
 		$scope.$apply();
-		var storageByDesc = data.objDevices['storageByDesc'];
-		for(i in data.devicelist){
-			$("td:contains('"+ data.devicelist[i] +"')").attr('socket-id', storageByDesc[data.devicelist[i]]);
-		}
-		$("td[socket-id='"+ socketp2p.id +"']").text('This Device');
 	}	
 
 	$scope.addDevice = function(){
 		var desp = document.getElementsByName('device-desp')[0].value;
 		var room = '757704ca-28a2-48e0-8a79-c6d02e7486e3';
+		var deviceId = localStorage.getItem('device-id');
 		// var room = document.getElementsByName('room')[0].value;
-		socketp2p.emit('joinmeto', {room: room, desp: desp});
+		socketp2p.emit('joinmeto', {room: room, desp: desp, deviceId: deviceId});
 		// document.cookie = "room="+room;
 		// document.cookie = "desp="+desp;
 		window.localStorage.setItem('room', room);

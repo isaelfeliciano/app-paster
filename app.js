@@ -1,3 +1,6 @@
+/*if (color in colorObj){
+  // Haz algo
+}*/
 console.logIt = function(str){
   console.log("BEGIN----");
   console.log(str);
@@ -12,6 +15,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var uuid = require('uuid');
+var shortid = require('shortid');
 var uaParser = require('ua-parser-js');
 
 var socketLocalStorage = {};
@@ -46,47 +50,43 @@ io.on('connection', function(socket){
   }
 
   socket.on('leave-default-room', function (){
-    var defaultRoom = this.id;
-    this.leave(defaultRoom);
+    this.leave(this.id);
+  });
+
+  socket.on('get-device-id', function(){
+    var deviceID = shortid.generate();
+    socket.emit('device-id', deviceID);
   });
 
   socket.on('joinmeto', function (data){
+    var room = data.room;
+    console.logIt('joinmeto: '+ data.room);
     this.join(data.room);
+    var deviceId = data.deviceId;
     var ua = uaParser(this.handshake.headers['user-agent']);
     var desc = ua.browser.name + ' On ' + ua.os.name + ' - '+ ua.os.version;
-    !socketLocalStorage[data.room] ? socketLocalStorage[data.room] = {
-      'storageByDesc': {},
-      'storageBySocket': {},
-      'devices': [],
-      'devicesArrayOfObj': []
-    } : null;
-    var storageByDesc = socketLocalStorage[data.room]['storageByDesc'];
-    storageByDesc[desc] = this.id;
-    var storageBySocket = socketLocalStorage[data.room]['storageBySocket'];
-    storageBySocket[this.id] = desc;
-    // socketLocalStorage[data.room][desc] = this.id;
-    var devices = socketLocalStorage[data.room]['devices'];
-    devices = Object.keys(storageByDesc);
+    if (!socketLocalStorage[data.room]){
+      socketLocalStorage[data.room] = {}
+    }
+    socketLocalStorage[data.room][data.deviceId] = {
+      'desc': desc,
+      'socket-id': this.id,
+      'status': 'online'
+    }
+    console.logIt(socketLocalStorage[data.room]);
+    // var devices = socketLocalStorage[room]['devices'];
+    devices = Object.keys(socketLocalStorage[data.room]);
     console.logIt('devices: '+devices);
+    var deviceList = [];
+    for (var i = 0; i < devices.length; i++) {
+      deviceList.push(socketLocalStorage[data.room][devices[i]].desc);
+    }
 
-    var devicesArrayOfObj = socketLocalStorage[data.room]['devicesArrayOfObj']; 
-    devicesArrayOfObj.push(storageByDesc);
-    console.logIt('devicesArrayOfObj: ');
-    console.logIt(devicesArrayOfObj);
-    // devices.push({dev: desc});
-    console.logIt(this.id+ ' room: '+data.room);
-    var room = io.sockets.adapter.rooms[data.room];
-    console.logIt(Object.keys(room));
-    console.logIt(socketLocalStorage);
     this.broadcast.to(data.room).emit('joinedToRoom', {
-      devicelist: devices,
-      objDevices: socketLocalStorage[data.room],
-      arrayDevices: devicesArrayOfObj
+      devicelist: deviceList
     });
     this.emit('joinedToRoom', {
-      devicelist: devices,
-      objDevices: socketLocalStorage[data.room],
-      arrayDevices: devicesArrayOfObj
+      devicelist: deviceList
     });
   });
 
@@ -97,7 +97,7 @@ io.on('connection', function(socket){
     var clientsInRoomArray = [];
     this.broadcast.to(thisRoom).emit('message', {
       msg: data.text,
-      sender: socketLocalStorage[thisRoom].storageBySocket[data.id]
+      sender: socketLocalStorage[thisRoom][data.id].desc
     });
     console.logIt('send to room');
     for (client in clientsInRoom) {
@@ -110,14 +110,14 @@ io.on('connection', function(socket){
   });
 
   socket.on('disconnect', function(){
-    var _socket = this;
+    /*var _socket = this;
     var thisRoom = this.adapter.rooms;
     var id = this.id;
     thisRoom = Object.keys(thisRoom)[0];
     console.logIt('User disconnected: '+ id + ' from this room: '+ thisRoom);
     io.to(thisRoom).emit('user-disconnected', {id: id}, {});
     if (thisRoom !== undefined) 
-      socketLocalStorage.update(_socket);
+      socketLocalStorage.update(_socket);*/
   });
 });
 
@@ -179,6 +179,7 @@ app.use('/users', users);
 
 app.use('/uuid', function (req, res){
   var roomUuid;
+  // roomUuid = shortid.generate();
   roomUuid = uuid.v4();
   res.send(roomUuid);
 });

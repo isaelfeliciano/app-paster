@@ -24,5 +24,9 @@ app.config(function ($routeProvider, $locationProvider){
 		.when('/qrscanner2', {
 			templateUrl: 'js/views/qrscanner2.html',
 			controller: 'QrCodeController2'
+		})
+		.when('/testqrscan', {
+			templateUrl: 'js/views/test-qrcode-scan.html',
+			controller: 'MainController'
 		});
 }); 
