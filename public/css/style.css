@@ -190,11 +190,14 @@ textarea{color: white;
   border-radius: 10px;
   z-index: 9999;
 }
-.modal-container .text-top
-{
-  color: #08327D;
-  font-size: 1.1em;
-}
+  .modal-container .text-top
+  {
+    color: #08327D;
+    font-size: 1.1em;
+  }
+  .video-dialog{
+    height: 50%;
+  }
 #qrcode
 {
   width: 100%;
@@ -225,6 +228,11 @@ textarea{color: white;
 .close
 {
   color: #08327D;
+}
+
+.scan-video{
+  width: 90%;
+  height: 90%;
 }
 /*-Modal*/
 

@@ -111,6 +111,20 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 	};
 
 	// -Modal
+
+	$scope.scanQr = function(){
+		$('#open-modal').toggleClass('notVisible');
+		$('#scan-modal').toggleClass('notVisible');
+		$('#reader').html5_qrcode(function(data){
+			$scope.modal();
+			$('#reader').html5_qrcode_stop();
+			socketStarter(data);
+		}, function(error){
+			flashMessage(error);
+		}, function(videoError){
+			flashMessage(videoError)
+		});
+	}
 	
 	// Dropdown-			
 	function DropDown(el) {

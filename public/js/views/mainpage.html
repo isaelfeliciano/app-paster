@@ -40,8 +40,13 @@
 		      <div id="qrcode" class="layout-qrcode center-absolute"></div>
 		    </div>
 		    <div class="modal-btn-container">
-		      <input type="file" class="square-button center-align center-align-absolute" custom-on-change="uploadFile" value="Scan other device QR Code"/>
+		    	<button ng-click="scanQr()">Scan</button>
+		      <!-- <input type="file" class="square-button center-align center-align-absolute" custom-on-change="uploadFile" value="Scan other device QR Code"/> -->
 		    </div>
+		  </div>
+
+		  <div id="scan-modal" class="modal-dialog video-dialog box-shadow center notVisible">
+		    <div id="reader" class="scan-video"></div>
 		  </div>
 		</div>
 	</div>
