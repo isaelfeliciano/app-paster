@@ -74,6 +74,9 @@ textarea{color: white;
   border-right: 1px solid #08327d;  
   border-bottom: 2px solid #27FFEF; 
 }
+/*video{
+  border: 1px solid white;
+}*/
 
 .layout-container{
 	width: 100%;
@@ -195,8 +198,11 @@ textarea{color: white;
     color: #08327D;
     font-size: 1.1em;
   }
-  .video-dialog{
-    height: 50%;
+  #scan-modal.video-dialog{
+    top: 2em;
+    height: 90%;
+    /*background: transparent;*/
+    box-shadow: unset;
   }
 #qrcode
 {
