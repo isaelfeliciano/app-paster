@@ -1,11 +1,6 @@
 /*if (color in colorObj){
   // Haz algo
 }*/
-console.logIt = function(str){
-  console.log("BEGIN----");
-  console.log(str);
-  console.log("----END");
-  }
 
 var express = require('express');
 var path = require('path');
@@ -15,8 +10,25 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var uuid = require('uuid');
-var shortid = require('shortid');
+var shortId = require('shortId');
 var uaParser = require('ua-parser-js');
+
+var MongoClient = require('mongodb').MongoClient;
+var mongoDbObj;
+var assert = require('assert');
+var ObjectId = require('mongodb').ObjectID;
+var dbUrl = require('mongodb://localhost:27017/remote-paster');
+
+MongoClient.connect(dbUrl, function(err, db) {
+  if (err)
+    console.log(err);
+  else {
+    console.logIt("Connected to MongoDB");
+    mongoDbObj = {db: db,
+      rooms = db.collection('rooms');
+    };
+  };
+});
 
 var socketLocalStorage = {};
 var devices = [];
@@ -30,6 +42,14 @@ var options = {
   key: rmkey,
   cert: rmcert
 };
+
+// Para ayudar a diferenciar los logs
+console.logIt = function(str){
+  console.log("BEGIN----");
+  console.log(str);
+  console.log("----END");
+}
+
 var socket_io = require('socket.io');
 var app = express();
 var io = socket_io();
@@ -54,11 +74,12 @@ io.on('connection', function(socket){
   });
 
   socket.on('get-device-id', function(){
-    var deviceID = shortid.generate();
+    var deviceID = shortId.generate();
     socket.emit('device-id', deviceID);
   });
 
   socket.on('joinmeto', function (data){
+    var roomObj = {};
     var room = data.room;
     console.logIt('joinmeto: '+ data.room);
     this.join(data.room);
@@ -179,7 +200,7 @@ app.use('/users', users);
 
 app.use('/uuid', function (req, res){
   var roomUuid;
-  // roomUuid = shortid.generate();
+  // roomUuid = shortId.generate();
   roomUuid = uuid.v4();
   res.send(roomUuid);
 });
