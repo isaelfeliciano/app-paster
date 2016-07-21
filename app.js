@@ -7,17 +7,18 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
+var cookieToObj = require('cookie');
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var uuid = require('uuid');
-var shortId = require('shortId');
+var shortId = require('shortid');
 var uaParser = require('ua-parser-js');
 
 var MongoClient = require('mongodb').MongoClient;
 var mongoDbObj;
 var assert = require('assert');
 var ObjectId = require('mongodb').ObjectID;
-var dbUrl = require('mongodb://localhost:27017/remote-paster');
+var dbUrl = 'mongodb://localhost:27017/remote-paster';
 
 MongoClient.connect(dbUrl, function(err, db) {
   if (err)
@@ -25,7 +26,7 @@ MongoClient.connect(dbUrl, function(err, db) {
   else {
     console.logIt("Connected to MongoDB");
     mongoDbObj = {db: db,
-      rooms = db.collection('rooms');
+      rooms: db.collection('rooms')
     };
   };
 });
@@ -58,45 +59,75 @@ var p2p = require('socket.io-p2p-server').Server;
 io.use(p2p);
 
 
+var insertDocument = function(filter, doc) {
+  try {
+    mongoDbObj.rooms.updateOne(filter, {$set: doc}, {upsert: true});
+  } catch (e) {
+    print(e);
+  }
+};
+
 /*var io = require('socket.io')({
   'close timeout': 606024
 }, server);
 io.use(p2pserver);*/
 io.on('connection', function(socket){
-  console.logIt('Socket connected: '+socket.id)
+  console.logIt('Socket connected: '+socket.id);
   var firstTime = false;
   if (socket.handshake.headers.cookie){
+    let cookie = socket.handshake.headers.cookie;
+    // Is a Reconnection
     firstTime = true;
+    socket.reconnection = true; // Just to mark it
+    // to prevent the disconnect event change the
+    // status to offline 
+    let oldSocketId = cookieToObj.parse(cookie).io;
+    insertDocument({ 'socketId': oldSocketId }, {
+      'socketId': socket.id,
+      'status': 'online'
+    });
   }
+
+  socket.on('disconnect', function() {
+    let socket = this;
+    insertDocument({ 'socketId': socket.id }, {
+      'status': 'offline'
+    });
+  });
 
   socket.on('leave-default-room', function (){
     this.leave(this.id);
   });
 
   socket.on('get-device-id', function(){
-    var deviceID = shortId.generate();
-    socket.emit('device-id', deviceID);
+    socket.emit('device-id', shortId.generate());
   });
 
   socket.on('joinmeto', function (data){
-    var roomObj = {};
+    let roomObj = {};
     var room = data.room;
+    var deviceId = data.deviceId;
     console.logIt('joinmeto: '+ data.room);
     this.join(data.room);
-    var deviceId = data.deviceId;
     var ua = uaParser(this.handshake.headers['user-agent']);
     var desc = ua.browser.name + ' On ' + ua.os.name + ' - '+ ua.os.version;
-    if (!socketLocalStorage[data.room]){
-      socketLocalStorage[data.room] = {}
-    }
-    socketLocalStorage[data.room][data.deviceId] = {
-      'desc': desc,
-      'socket-id': this.id,
+    console.logIt(data);
+    roomObj = {
+      'room': room,
+      'deviceId': deviceId,
+      'description': desc,
+      'socketId': this.id,
       'status': 'online'
     }
-    console.logIt(socketLocalStorage[data.room]);
+    insertDocument({
+      'room': room,
+      'deviceId': deviceId
+    }, roomObj);
+
+    console.logIt(roomObj);
+
     // var devices = socketLocalStorage[room]['devices'];
-    devices = Object.keys(socketLocalStorage[data.room]);
+    /*devices = Object.keys(socketLocalStorage[data.room]);
     console.logIt('devices: '+devices);
     var deviceList = [];
     for (var i = 0; i < devices.length; i++) {
@@ -108,7 +139,7 @@ io.on('connection', function(socket){
     });
     this.emit('joinedToRoom', {
       devicelist: deviceList
-    });
+    });*/
   });
 
 
@@ -130,16 +161,20 @@ io.on('connection', function(socket){
     console.logIt(clientsInRoomArray);
   });
 
-  socket.on('disconnect', function(){
-    /*var _socket = this;
+  /*socket.on('disconnect', function() {
+    let socket = this;
+    insertDocument({ 'socketId': socket.id }, {
+      'status': 'offline'
+    });
+    var _socket = this;
     var thisRoom = this.adapter.rooms;
     var id = this.id;
     thisRoom = Object.keys(thisRoom)[0];
     console.logIt('User disconnected: '+ id + ' from this room: '+ thisRoom);
     io.to(thisRoom).emit('user-disconnected', {id: id}, {});
     if (thisRoom !== undefined) 
-      socketLocalStorage.update(_socket);*/
-  });
+      socketLocalStorage.update(_socket);
+  });*/
 });
 
 socketLocalStorage.update = function(_socket){

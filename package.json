@@ -16,6 +16,7 @@
     "socket.io": "latest",
     "ua-parser-js": "latest",
     "shortid": "latest",
-    "mongodb": "latest"
+    "mongodb": "latest",
+    "cookie": "latest"
   }
 }

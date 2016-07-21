@@ -1,5 +1,3 @@
 - Crear una funcion para obtener status cuando la APP sea visible nuevamente (En Movil)
 - Reparar dropdown lista de dispositivos online y offline
-- Re-habilitar funcion que actua cuando un dispositivo se desconecta
 - Transferencia de archivos
-- Implemetar MongoDB

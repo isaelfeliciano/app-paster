@@ -1,6 +1,6 @@
 app.controller('MainController', ['$scope', '$http', '$window', function ($scope, $http, $window){
 
-	var ip_address = '192.168.88.219';
+	var ip_address = '192.168.88.5';
 
 	$(document)
 		.one('focus.textarea', '.autoExpand', function(){
@@ -164,8 +164,9 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 	  	// socketp2p = io('http://192.168.88.219:3333');
 	  	var deviceId = localStorage.getItem('device-id');
 	  	socketp2p.emit('leave-default-room', {});
-	  	socketp2p.emit('joinmeto', {room: uuid, desp: 'desktop', deviceId: deviceId});
-	  	socketOn();
+	  	socketOn(function(deviceId) {
+		  	socketp2p.emit('joinmeto', {room: uuid, desp: 'desktop', deviceId: deviceId});
+	  	});
 	  }
   }
 
@@ -195,16 +196,19 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
   	return localStorage.getItem('device-id');
   }
 
-  function socketOn(){
+  function socketOn(callback){
 		socketp2p.on('connect', function(){
 			flashMessage('Event: connect');
 			localStorage.setItem('socketId', socket.id);
 			if (!localStorage.getItem('device-id'))
 				socketp2p.emit('get-device-id');
+				console.log("Event: Get Device ID");
 		});
 		socketp2p.on('device-id', function(data){
 			localStorage.setItem('device-id', data);
-		})
+			callback(data);
+			// callback from top function in this scope
+		});
 		socketp2p.on('connect_error', function(){
 			console.log('Event: connect_error');
 		});
