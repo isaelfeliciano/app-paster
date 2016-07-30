@@ -2,12 +2,18 @@
 	<header>
 		<h2>Simplicopi</h2>
 	</header>
-  <div id="dd" class="dropdown-container center-align center-text" ng-data="devicelist">
-    <span>Devices: You +{{ devicelist.length }} <i class="fa fa-chevron-down"></i></span>
-    <ul class="dropdown">
-      <li class="list-el selected" ng-repeat=" device in devicelist">{{ device }}</li>
-    </ul>
+	<a href="javascript:void(0)" ng-click="openDeviceList()">
+  <div id="btn-dropdown" class="dropdown-container center-align center-text" ng-data="devicelist">
+    <span>Devices: {{ devicelist }} <i class="fa fa-chevron-right"></i></span>
+  </div></a>
+
+  <div class="device-list device-list--hide center-align">
+  	<button class="btn btn--round" ng-click="openDeviceList()"><i class="fa fa-2x fa-close"></i></button>
+  	<ul>
+  		
+  	</ul>
   </div>
+
 	<div class="layout-container">
 		<div class="layout-message notVisible">
           <span class="sender">{{ sender }}</span>
@@ -21,13 +27,13 @@
 		</div>
 
 		<div class="layout-3btns center-text">
-			<button class="btn btn-round" ng-click="sendTextToRoom()">
+			<button class="btn btn--round" ng-click="sendTextToRoom()">
 				<i class="fa fa-2x">&#xf1d8;</i>
 			</button>
-			<button class="btn btn-round">
+			<button class="btn btn--round">
 				<i class="fa fa-2x">&#xf0c6;</i>
 			</button>
-			<button class="btn btn-round" ng-click="modal()">
+			<button class="btn btn--round" ng-click="modal()">
 				<i class="fa fa-2x">&#xf067;</i>
 			</button>
 		</div>

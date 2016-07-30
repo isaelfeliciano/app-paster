@@ -63,9 +63,19 @@ var insertDocument = function(filter, doc) {
   try {
     mongoDbObj.rooms.updateOne(filter, {$set: doc}, {upsert: true});
   } catch (e) {
-    print(e);
+    throw (e);
   }
 };
+
+var getDevicesInRoom = function(room, callback) {
+  var myCursor = mongoDbObj.rooms.find( {"room": room})
+    .toArray(function(err, result) {
+      if (err) {
+        return console.log("Error Getting Device List")
+      }
+      callback(result);
+    });
+} 
 
 /*var io = require('socket.io')({
   'close timeout': 606024
@@ -81,17 +91,22 @@ io.on('connection', function(socket){
     socket.reconnection = true; // Just to mark it
     // to prevent the disconnect event change the
     // status to offline 
-    let oldSocketId = cookieToObj.parse(cookie).io;
+    /*let oldSocketId = cookieToObj.parse(cookie).io;
     insertDocument({ 'socketId': oldSocketId }, {
       'socketId': socket.id,
       'status': 'online'
-    });
+    });*/
   }
 
   socket.on('disconnect', function() {
-    let socket = this;
+    console.logIt("Socket Disconnected");
     insertDocument({ 'socketId': socket.id }, {
       'status': 'offline'
+    });
+
+    let room = Object.keys(socket.adapter.rooms)[0];
+    getDevicesInRoom(room, function(result) {
+      socket.broadcast.to(room).emit('updateData', result);
     });
   });
 
@@ -100,17 +115,19 @@ io.on('connection', function(socket){
   });
 
   socket.on('get-device-id', function(){
+    console.logIt("Sending device id");
     socket.emit('device-id', shortId.generate());
   });
 
   socket.on('joinmeto', function (data){
+    let socket = this;
     let roomObj = {};
     var room = data.room;
     var deviceId = data.deviceId;
     console.logIt('joinmeto: '+ data.room);
     this.join(data.room);
     var ua = uaParser(this.handshake.headers['user-agent']);
-    var desc = ua.browser.name + ' On ' + ua.os.name + ' - '+ ua.os.version;
+    var desc = ua.browser.name + ' On ' + ua.os.name;
     console.logIt(data);
     roomObj = {
       'room': room,
@@ -126,39 +143,30 @@ io.on('connection', function(socket){
 
     console.logIt(roomObj);
 
-    // var devices = socketLocalStorage[room]['devices'];
-    /*devices = Object.keys(socketLocalStorage[data.room]);
-    console.logIt('devices: '+devices);
-    var deviceList = [];
-    for (var i = 0; i < devices.length; i++) {
-      deviceList.push(socketLocalStorage[data.room][devices[i]].desc);
-    }
+    this.emit('joinedToRoom');
 
-    this.broadcast.to(data.room).emit('joinedToRoom', {
-      devicelist: deviceList
-    });
-    this.emit('joinedToRoom', {
-      devicelist: deviceList
-    });*/
+    this.broadcast.to(room).emit('other-device-joined-room');
   });
 
+  socket.on("get-device-list", function() {
+    let room = Object.keys(this.adapter.rooms)[0];
+    getDevicesInRoom(room, function(result) {
+      socket.emit('updateData', result);
+    });
+  });
 
   socket.on('to-room', function (data){
     var thisRoom = Object.keys(this.adapter.rooms)[0];
     var clientsInRoom = this.adapter.rooms[thisRoom];
     var clientsInRoomArray = [];
     this.broadcast.to(thisRoom).emit('message', {
-      msg: data.text,
-      sender: socketLocalStorage[thisRoom][data.id].desc
+      msg: data.text
+      // sender: socketLocalStorage[thisRoom][data.id].desc
     });
     console.logIt('send to room');
     for (client in clientsInRoom) {
       clientsInRoomArray.push(client);
     }
-    /*for (var i = 0; i = clientsInRoomArray.length; i++){
-
-    }*/
-    console.logIt(clientsInRoomArray);
   });
 
   /*socket.on('disconnect', function() {
@@ -233,11 +241,11 @@ app.use(function (req, res, next){
 app.use('/', routes);
 app.use('/users', users);
 
-app.use('/uuid', function (req, res){
+app.use('/getuuid', function (req, res){
   var roomUuid;
   // roomUuid = shortId.generate();
   roomUuid = uuid.v4();
-  res.send(roomUuid);
+  res.send(uuid.v4());
 });
 
 // catch 404 and forward to error handler

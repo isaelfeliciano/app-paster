@@ -45,7 +45,7 @@ header{
 	width: 100%;
 	height: 3em;
 	
-  color: #fff;
+    color: #fff;
 	display: block;
 	background: #04193F;
 }
@@ -98,7 +98,7 @@ textarea{color: white;
 }
 .layout-message .message{
 	width: 100%;
-    padding: 1em;
+  padding: 1em;
 	overflow-y: auto;
   
     background: #FFF;
@@ -115,6 +115,45 @@ textarea{color: white;
   margin-top: 3em;
 }
 
+.device-list {
+  position: fixed;
+  top: 0;
+  height: 100%;
+  width: 80%;
+  max-width: 400px;
+  z-index: 999999;
+  background-color: #0C0D05;
+  
+  -webkit-box-shadow: -9px 0px 16px -6px rgba(0,0,0,0.75);
+  -moz-box-shadow: -9px 0px 16px -6px rgba(0,0,0,0.75);
+  box-shadow: -9px 0px 16px -6px rgba(0,0,0,0.75);
+}
+  .device-list--hide {
+    right: -100%;
+    transition: right 1.5s;
+  }
+  .device-list--visible {
+    right: 0;
+    transition: right 1s;
+  }
+  .device-list li {
+    width: 95%;
+    padding: 1em;
+    margin: 1em auto;
+    text-align: right;
+/*    background-color: #c1eaf2;*/
+    border-bottom: 0.2em solid #27FFEF;
+  }
+  .device-list li:last-child {
+    border-bottom: none;
+  }
+  .device-list li p {
+    color: #f8f8f8;
+  }
+  .device-list li span {
+    color: #27FFEF;
+  }
+
 /*Buttons*/
 
 .btn{
@@ -124,7 +163,7 @@ textarea{color: white;
   background: #27FFEF;
   border:solid #27FFEF;
 }
-.btn-round{
+.btn--round{
   width: 4em;
   height: 4em;
   border-radius: 50%;
