@@ -180,17 +180,12 @@ io.on('connection', function(socket){
   });
 
   socket.on('to-room', function (data){
-    var thisRoom = Object.keys(this.adapter.rooms)[0];
-    var clientsInRoom = this.adapter.rooms[thisRoom];
-    var clientsInRoomArray = [];
-    this.broadcast.to(thisRoom).emit('message', {
+    let room = data.room
+    this.broadcast.to(room).emit('message', {
       msg: data.text
       // sender: socketLocalStorage[thisRoom][data.id].desc
     });
     console.logIt('send to room');
-    for (client in clientsInRoom) {
-      clientsInRoomArray.push(client);
-    }
   });
 
   /*socket.on('disconnect', function() {
