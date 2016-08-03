@@ -2,6 +2,12 @@
   // Haz algo
 }*/
 
+if (process.env.NODE_ENV === "production") {
+  var dbUrl = 'mongodb://isael:isael.db@ds139645.mlab.com:39645/facilcopy';
+} else {
+  var dbUrl = 'mongodb://localhost:27017/remote-paster';
+}
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -18,7 +24,6 @@ var MongoClient = require('mongodb').MongoClient;
 var mongoDbObj;
 var assert = require('assert');
 var ObjectId = require('mongodb').ObjectID;
-var dbUrl = 'mongodb://localhost:27017/remote-paster';
 
 MongoClient.connect(dbUrl, function(err, db) {
   if (err)
@@ -30,6 +35,7 @@ MongoClient.connect(dbUrl, function(err, db) {
     };
   };
 });
+
 
 var socketLocalStorage = {};
 var devices = [];
