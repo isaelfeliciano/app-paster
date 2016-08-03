@@ -1,6 +1,11 @@
 app.controller('MainController', ['$scope', '$http', '$window', function ($scope, $http, $window){
 
 	var ip_address = '192.168.88.5';
+	if (true) {
+		var serverURL = "https://facilcopy.herokuapp.com";
+	} else {	
+		var serverURL = "http://localhost:3333";
+	}
 	$scope.devicelist = "Just you";
 
 	$(document)
@@ -89,7 +94,7 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 
 	// var P2P = require('socket.io-p2p');
 	// var io = require('sock.io-client');
-	var socket = io();
+	var socket = io.connect(serverURL);
 	var opts = {autoUpgrade: false, peerOpts: {numClients: 10}};
 	var socketp2p = new P2P(socket, opts);
 	socketp2p.on('peer-msg', function(data){
@@ -108,7 +113,7 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 	else {
     var oReq = new XMLHttpRequest();
     oReq.addEventListener('load', socketStarter);
-    oReq.open('GET', 'http://localhost:3333/getuuid');
+    oReq.open('GET', serverURL+'/getuuid');
     oReq.send();
   }
 

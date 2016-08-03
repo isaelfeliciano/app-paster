@@ -91,7 +91,7 @@ io.on('connection', function(socket){
   console.logIt('Socket connected: '+socket.id);
   var firstTime = false;
   if (socket.handshake.headers.cookie){
-    var cookie = socket.handshake.headers.cookie;
+    let cookie = socket.handshake.headers.cookie;
     // Is a Reconnection
     firstTime = true;
     socket.reconnection = true; // Just to mark it
@@ -157,6 +157,8 @@ io.on('connection', function(socket){
   socket.on("get-device-list", function() {
     let room = Object.keys(this.adapter.rooms)[0];
     getDevicesInRoom(room, function(result) {
+      console.logIt("Update Data");
+      console.logIt(result);
       socket.emit('updateData', result);
     });
   });
@@ -191,33 +193,7 @@ io.on('connection', function(socket){
   });*/
 });
 
-socketLocalStorage.update = function(_socket){
-  var room = _socket.adapter.rooms;
-  room = Object.keys(room)[0];
-  console.logIt(room);
-  var desc = socketLocalStorage[room]['storageBySocket'][_socket.id];
-  delete socketLocalStorage[room]['storageBySocket'][_socket.id];
-  delete socketLocalStorage[room]['storageByDesc'][desc];
-  console.logIt(socketLocalStorage);
-  var storageByDesc = socketLocalStorage[room]['storageByDesc'];
-  // storageByDesc[desc] = _socket.id;
-  // var storageBySocket = socketLocalStorage[room]['storageBySocket'];
-  // storageBySocket[_socket.id] = desc;
-  // socketLocalStorage[room][desc] = this.id;
-  var devices = socketLocalStorage[room]['devices'];
-  devices = Object.keys(storageByDesc);
 
-  var devicesArrayOfObj = socketLocalStorage[room]['devicesArrayOfObj']; 
-  // devicesArrayOfObj.push(storageByDesc);
-  // devices.push({dev: desc});
-  var objRoom = io.sockets.adapter.rooms[room];
-
-  io.to(room).emit('updateData', {
-    devicelist: devices,
-    objDevices: socketLocalStorage[room],
-    arrayDevices: devicesArrayOfObj
-  });
-}
 /*io.on('emit-to-room', function (data){
     socket.to(data.room).emit('test');
   });*/

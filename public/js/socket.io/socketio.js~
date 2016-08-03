@@ -1,0 +1,388 @@
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.io=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){ 
+ 
+module.exports = _dereq_('./lib/'); 
+ 
+},{"./lib/":2}],2:[function(_dereq_,module,exports){ 
+ 
+/** 
+ * Module dependencies. 
+ */ 
+ 
+var url = _dereq_('./url'); 
+var parser = _dereq_('socket.io-parser'); 
+var Manager = _dereq_('./manager'); 
+var debug = _dereq_('debug')('socket.io-client'); 
+ 
+/** 
+ * Module exports. 
+ */ 
+ 
+module.exports = exports = lookup; 
+ 
+/** 
+ * Managers cache. 
+ */ 
+ 
+var cache = exports.managers = {}; 
+ 
+/** 
+ * Looks up an existing `Manager` for multiplexing. 
+ * If the user summons: 
+ * 
+ *   `io('http://localhost/a');` 
+ *   `io('http://localhost/b');` 
+ * 
+ * We reuse the existing instance based on same scheme/port/host, 
+ * and we initialize sockets for each namespace. 
+ * 
+ * @api public 
+ */ 
+ 
+function lookup(uri, opts) { 
+  if (typeof uri == 'object') { 
+    opts = uri; 
+    uri = undefined; 
+  } 
+ 
+  opts = opts || {}; 
+ 
+  var parsed = url(uri); 
+  var source = parsed.source; 
+  var id = parsed.id; 
+  var io; 
+ 
+  if (opts.forceNew || opts['force new connection'] || false === opts.multiplex) { 
+    debug('ignoring socket cache for %s', source); 
+    io = Manager(source, opts); 
+  } else { 
+    if (!cache[id]) { 
+      debug('new io instance for %s', source); 
+      cache[id] = Manager(source, opts); 
+    } 
+    io = cache[id]; 
+  } 
+ 
+  return io.socket(parsed.path); 
+} 
+ 
+/** 
+ * Protocol version. 
+ * 
+ * @api public 
+ */ 
+ 
+exports.protocol = parser.protocol; 
+ 
+/** 
+ * `connect`. 
+ * 
+ * @param {String} uri 
+ * @api public 
+ */ 
+ 
+exports.connect = lookup; 
+ 
+/** 
+ * Expose constructors for standalone build. 
+ * 
+ * @api public 
+ */ 
+ 
+exports.Manager = _dereq_('./manager'); 
+exports.Socket = _dereq_('./socket'); 
+ 
+},{"./manager":3,"./socket":5,"./url":6,"debug":10,"socket.io-parser":44}],3:[function(_dereq_,module,exports){ 
+ 
+/** 
+ * Module dependencies. 
+ */ 
+ 
+var url = _dereq_('./url'); 
+var eio = _dereq_('engine.io-client'); 
+var Socket = _dereq_('./socket'); 
+var Emitter = _dereq_('component-emitter'); 
+var parser = _dereq_('socket.io-parser'); 
+var on = _dereq_('./on'); 
+var bind = _dereq_('component-bind'); 
+var object = _dereq_('object-component'); 
+var debug = _dereq_('debug')('socket.io-client:manager'); 
+var indexOf = _dereq_('indexof'); 
+var Backoff = _dereq_('backo2'); 
+ 
+/** 
+ * Module exports 
+ */ 
+ 
+module.exports = Manager; 
+ 
+/** 
+ * `Manager` constructor. 
+ * 
+ * @param {String} engine instance or engine uri/opts 
+ * @param {Object} options 
+ * @api public 
+ */ 
+ 
+function Manager(uri, opts){ 
+  if (!(this instanceof Manager)) return new Manager(uri, opts); 
+  if (uri && ('object' == typeof uri)) { 
+    opts = uri; 
+    uri = undefined; 
+  } 
+  opts = opts || {}; 
+ 
+  opts.path = opts.path || '/socket.io'; 
+  this.nsps = {}; 
+  this.subs = []; 
+  this.opts = opts; 
+  this.reconnection(opts.reconnection !== false); 
+  this.reconnectionAttempts(opts.reconnectionAttempts || Infinity); 
+  this.reconnectionDelay(opts.reconnectionDelay || 1000); 
+  this.reconnectionDelayMax(opts.reconnectionDelayMax || 5000); 
+  this.randomizationFactor(opts.randomizationFactor || 0.5); 
+  this.backoff = new Backoff({ 
+    min: this.reconnectionDelay(), 
+    max: this.reconnectionDelayMax(), 
+    jitter: this.randomizationFactor() 
+  }); 
+  this.timeout(null == opts.timeout ? 20000 : opts.timeout); 
+  this.readyState = 'closed'; 
+  function has(name) { 
+    if (has[name] !== undef) { 
+      // Return cached feature test result. 
+      return has[name]; 
+    } 
+ 
+    var isSupported; 
+    if (name == "bug-string-char-index") { 
+      // IE <= 7 doesn't support accessing string characters using square 
+      // bracket notation. IE 8 only supports this for primitives. 
+      isSupported = "a"[0] != "a"; 
+    } else if (name == "json") { 
+      // Indicates whether both `JSON.stringify` and `JSON.parse` are 
+      // supported. 
+      isSupported = has("json-stringify") && has("json-parse"); 
+    } else { 
+      var value, serialized = '{"a":[1,true,false,null,"\\u0000\\b\\n\\f\\r\\t"]}'; 
+      // Test `JSON.stringify`. 
+      if (name == "json-stringify") { 
+        var stringify = JSON3.stringify, stringifySupported = typeof stringify == "function" && isExtended; 
+        if (stringifySupported) { 
+          // A test function object with a custom `toJSON` method. 
+          (value = function () { 
+            return 1; 
+          }).toJSON = value; 
+          try { 
+            stringifySupported = 
+              // Firefox 3.1b1 and b2 serialize string, number, and boolean 
+              // primitives as object literals. 
+              stringify(0) === "0" && 
+              // FF 3.1b1, b2, and JSON 2 serialize wrapped primitives as object 
+              // literals. 
+              stringify(new Number()) === "0" && 
+              stringify(new String()) == '""' && 
+              // FF 3.1b1, 2 throw an error if the value is `null`, `undefined`, or 
+              // does not define a canonical JSON representation (this applies to 
+              // objects with `toJSON` properties as well, *unless* they are nested 
+              // within an object or array). 
+              stringify(getClass) === undef && 
+              // IE 8 serializes `undefined` as `"undefined"`. Safari <= 5.1.7 and 
+              // FF 3.1b3 pass this test. 
+              stringify(undef) === undef && 
+              // Safari <= 5.1.7 and FF 3.1b3 throw `Error`s and `TypeError`s, 
+              // respectively, if the value is omitted entirely. 
+              stringify() === undef && 
+              // FF 3.1b1, 2 throw an error if the given value is not a number, 
+              // string, array, object, Boolean, or `null` literal. This applies to 
+              // objects with custom `toJSON` methods as well, unless they are nested 
+              // inside object or array literals. YUI 3.0.0b1 ignores custom `toJSON` 
+              // methods entirely. 
+              stringify(value) === "1" && 
+              stringify([value]) == "[1]" && 
+              // Prototype <= 1.6.1 serializes `[undefined]` as `"[]"` instead of 
+              // `"[null]"`. 
+              stringify([undef]) == "[null]" && 
+              // YUI 3.0.0b1 fails to serialize `null` literals. 
+              stringify(null) == "null" && 
+              // FF 3.1b1, 2 halts serialization if an array contains a function: 
+              // `[1, true, getClass, 1]` serializes as "[1,true,],". FF 3.1b3 
+              // elides non-JSON values from objects and arrays, unless they 
+              // define custom `toJSON` methods. 
+              stringify([undef, getClass, null]) == "[null,null,null]" && 
+              // Simple serialization test. FF 3.1b1 uses Unicode escape sequences 
+              // where character escape codes are expected (e.g., `\b` => `\u0008`). 
+              stringify({ "a": [value, true, false, null, "\x00\b\n\f\r\t"] }) == serialized && 
+              // FF 3.1b1 and b2 ignore the `filter` and `width` arguments. 
+              stringify(null, value) === "1" && 
+              stringify([1, 2], null, 1) == "[\n 1,\n 2\n]" && 
+              // JSON 2, Prototype <= 1.7, and older WebKit builds incorrectly 
+              // serialize extended years. 
+              stringify(new Date(-8.64e15)) == '"-271821-04-20T00:00:00.000Z"' && 
+              // The milliseconds are optional in ES 5, but required in 5.1. 
+              stringify(new Date(8.64e15)) == '"+275760-09-13T00:00:00.000Z"' && 
+              // Firefox <= 11.0 incorrectly serializes years prior to 0 as negative 
+              // four-digit years instead of six-digit years. Credits: @Yaffle. 
+              stringify(new Date(-621987552e5)) == '"-000001-01-01T00:00:00.000Z"' && 
+              // Safari <= 5.1.5 and Opera >= 10.53 incorrectly serialize millisecond 
+              // values less than 1000. Credits: @Yaffle. 
+              stringify(new Date(-1)) == '"1969-12-31T23:59:59.999Z"'; 
+          } catch (exception) { 
+            stringifySupported = false; 
+          } 
+        } 
+        isSupported = stringifySupported; 
+      } 
+      // Test `JSON.parse`. 
+      if (name == "json-parse") { 
+        var parse = JSON3.parse; 
+        if (typeof parse == "function") { 
+          try { 
+            // FF 3.1b1, b2 will throw an exception if a bare literal is provided. 
+            // Conforming implementations should also coerce the initial argument to 
+            // a string prior to parsing. 
+            if (parse("0") === 0 && !parse(false)) { 
+              // Simple parsing test. 
+              value = parse(serialized); 
+              var parseSupported = value["a"].length == 5 && value["a"][0] === 1; 
+              if (parseSupported) { 
+                try { 
+                  // Safari <= 5.1.2 and FF 3.1b1 allow unescaped tabs in strings. 
+                  parseSupported = !parse('"\t"'); 
+                } catch (exception) {} 
+                if (parseSupported) { 
+                  try { 
+                    // FF 4.0 and 4.0.1 allow leading `+` signs and leading 
+                    // decimal points. FF 4.0, 4.0.1, and IE 9-10 also allow 
+                    // certain octal literals. 
+                    parseSupported = parse("01") !== 1; 
+                  } catch (exception) {} 
+                } 
+                if (parseSupported) { 
+                  try { 
+                    // FF 4.0, 4.0.1, and Rhino 1.7R3-R4 allow trailing decimal 
+                    // points. These environments, along with FF 3.1b1 and 2, 
+                    // also allow trailing commas in JSON objects and arrays. 
+                    parseSupported = parse("1.") !== 1; 
+                  } catch (exception) {} 
+                } 
+              } 
+            } 
+          } catch (exception) { 
+            parseSupported = false; 
+          } 
+        } 
+        isSupported = parseSupported; 
+      } 
+    } 
+    return has[name] = !!isSupported; 
+  } 
+ 
+  if (!has("json")) { 
+    // Common `[[Class]]` name aliases. 
+    var functionClass = "[object Function]"; 
+    var dateClass = "[object Date]"; 
+    var numberClass = "[object Number]"; 
+    var stringClass = "[object String]"; 
+    var arrayClass = "[object Array]"; 
+    var booleanClass = "[object Boolean]"; 
+ 
+    // Detect incomplete support for accessing string characters by index. 
+    var charIndexBuggy = has("bug-string-char-index"); 
+ 
+    // Define additional utility methods if the `Date` methods are buggy. 
+    if (!isExtended) { 
+      var floor = Math.floor; 
+      // A mapping between the months of the year and the number of days between 
+      // January 1st and the first of the respective month. 
+      var Months = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]; 
+      // Internal: Calculates the number of days between the Unix epoch and the 
+      // first day of the given month. 
+              // name and value. 
+              if (value == "," || typeof value != "string" || (charIndexBuggy ? value.charAt(0) : value[0]) != "@" || lex() != ":") { 
+                abort(); 
+              } 
+              results[value.slice(1)] = get(lex()); 
+            } 
+            return results; 
+          } 
+          // Unexpected token encountered. 
+          abort(); 
+        } 
+        return value; 
+      }; 
+ 
+      // Internal: Updates a traversed object member. 
+      var update = function(source, property, callback) { 
+        var element = walk(source, property, callback); 
+        if (element === undef) { 
+          delete source[property]; 
+        } else { 
+          source[property] = element; 
+        } 
+      }; 
+ 
+      // Internal: Recursively traverses a parsed JSON object, invoking the 
+      // `callback` function for each value. This is an implementation of the 
+      // `Walk(holder, name)` operation defined in ES 5.1 section 15.12.2. 
+      var walk = function (source, property, callback) { 
+        var value = source[property], length; 
+        if (typeof value == "object" && value) { 
+          // `forEach` can't be used to traverse an array in Opera <= 8.54 
+          // because its `Object#hasOwnProperty` implementation returns `false` 
+          // for array indices (e.g., `![1, 2, 3].hasOwnProperty("0")`). 
+          if (getClass.call(value) == arrayClass) { 
+            for (length = value.length; length--;) { 
+              update(value, length, callback); 
+            } 
+          } else { 
+            forEach(value, function (property) { 
+              update(value, property, callback); 
+            }); 
+          } 
+        } 
+        return callback.call(source, property, value); 
+      }; 
+ 
+      // Public: `JSON.parse`. See ES 5.1 section 15.12.2. 
+      JSON3.parse = function (source, callback) { 
+        var result, value; 
+        Index = 0; 
+        Source = "" + source; 
+        result = get(lex()); 
+        // If a JSON string contains multiple tokens, it is invalid. 
+        if (lex() != "$") { 
+          abort(); 
+        } 
+        // Reset the parser state. 
+        Index = Source = null; 
+        return callback && getClass.call(callback) == functionClass ? walk((value = {}, value[""] = result, value), "", callback) : result; 
+      }; 
+    } 
+  } 
+ 
+  // Export for asynchronous module loaders. 
+  if (isLoader) { 
+    define(function () { 
+      return JSON3; 
+    }); 
+  } 
+}(this)); 
+ 
+},{}],48:[function(_dereq_,module,exports){ 
+module.exports = toArray 
+ 
+function toArray(list, index) { 
+    var array = [] 
+ 
+    index = index || 0 
+ 
+    for (var i = index || 0; i < list.length; i++) { 
+        array[i - index] = list[i] 
+    } 
+ 
+    return array 
+} 
+ 
+},{}]},{},[1]) 
+(1) 
+}); 
