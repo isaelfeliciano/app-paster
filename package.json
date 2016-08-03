@@ -17,6 +17,7 @@
     "ua-parser-js": "latest",
     "shortid": "latest",
     "mongodb": "latest",
-    "cookie": "latest"
+    "cookie": "latest",
+    "uuid": "latest"
   }
 }
