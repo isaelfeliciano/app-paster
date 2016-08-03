@@ -91,7 +91,7 @@ io.on('connection', function(socket){
   console.logIt('Socket connected: '+socket.id);
   var firstTime = false;
   if (socket.handshake.headers.cookie){
-    let cookie = socket.handshake.headers.cookie;
+    var cookie = socket.handshake.headers.cookie;
     // Is a Reconnection
     firstTime = true;
     socket.reconnection = true; // Just to mark it
