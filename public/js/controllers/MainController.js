@@ -224,11 +224,11 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 			// $("td[socket-id='"+ data.id + "']").parent().remove();
 		});
 		socketp2p.on('joinedToRoom', function(data){
-			socketp2p.emit('get-device-list');
+			socketp2p.emit('get-device-list', {room: getRoom()});
 		});
 
 		socketp2p.on('other-device-joined-room', function(data){
-			socketp2p.emit('get-device-list');
+			socketp2p.emit('get-device-list', {room: getRoom());
 		});	
 
 		socketp2p.on('updateData', function(data){

@@ -168,8 +168,9 @@ io.on('connection', function(socket){
     this.broadcast.to(room).emit('other-device-joined-room');
   });
 
-  socket.on("get-device-list", function() {
-    let room = Object.keys(this.adapter.rooms)[0];
+  socket.on("get-device-list", function(data) {
+    // let room = Object.keys(this.adapter.rooms)[0];
+    let room = data.room;
     console.logIt("get-device-list, room: " + room);
     getDevicesInRoom(room, function(result) {
       console.logIt("Update Data");
