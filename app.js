@@ -170,7 +170,7 @@ io.on('connection', function(socket){
 
   socket.on("get-device-list", function() {
     let room = Object.keys(this.adapter.rooms)[0];
-    getDevicesInRoom(room, function(result) {
+    getDevicesInRoom("0b58fb5f-03e6-4926-8f3e-b9dc818e6504", function(result) {
       console.logIt("Update Data");
       console.logIt(result);
       socket.emit('updateData', result);
