@@ -73,7 +73,7 @@ var insertDocument = function(filter, doc) {
   }
 };
 
-var getDevicesInRoom = function(room, callback) {
+/*var getDevicesInRoom = function(room, callback) {
   var myCursor = mongoDbObj.rooms.find( {"room": room})
     .toArray(function(err, result) {
       if (err) {
@@ -81,7 +81,21 @@ var getDevicesInRoom = function(room, callback) {
       }
       callback(result);
     });
-} 
+}*/
+
+var getDevicesInRoom = function(room, callback) {
+  let tempArray = [];
+  var myCursor = mongoDbObj.rooms.find( {"room": room});
+  myCursor.each(function(err, doc) {
+    assert.equal(err, null);
+    if (doc != null) {
+      tempArray.push(doc);
+    } else {
+      console.logIt("Error Getting devices " + err);
+    }
+    callback(tempArray);
+  });
+}  
 
 /*var io = require('socket.io')({
   'close timeout': 606024
