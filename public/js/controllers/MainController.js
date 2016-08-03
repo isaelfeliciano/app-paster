@@ -228,7 +228,7 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 		});
 
 		socketp2p.on('other-device-joined-room', function(data){
-			socketp2p.emit('get-device-list', {room: getRoom());
+			socketp2p.emit('get-device-list', {room: getRoom()});
 		});	
 
 		socketp2p.on('updateData', function(data){
