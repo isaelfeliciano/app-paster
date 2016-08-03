@@ -61,8 +61,8 @@ var socket_io = require('socket.io');
 var app = express();
 var io = socket_io();
 app.io = io;
-var p2p = require('socket.io-p2p-server').Server;
-io.use(p2p);
+// var p2p = require('socket.io-p2p-server').Server;
+// io.use(p2p);
 
 
 var insertDocument = function(filter, doc) {
