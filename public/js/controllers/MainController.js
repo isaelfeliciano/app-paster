@@ -144,6 +144,7 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 
   $scope.sendTextToRoom = function(){
   	var text = document.getElementsByName('textarea')[0].value;
+  	$('textarea').val('');
   	// var room = document.cookie.replace(/(?:(?:^|.*;\s*)room\s*\=\s*([^;]*).*$)|^.*$/, "$1");
   	var room = getRoom();
   	socketp2p.emit('to-room', {room: room, text: text, id: getDeviceId()});
