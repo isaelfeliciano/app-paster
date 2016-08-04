@@ -2,11 +2,6 @@
   // Haz algo
 }*/
 
-if (process.env.NODE_ENV === "production") {
-  var dbUrl = 'mongodb://isael:isael.db@ds139645.mlab.com:39645/facilcopy';
-} else {
-  var dbUrl = 'mongodb://localhost:27017/remote-paster';
-}
 
 var express = require('express');
 var path = require('path');
@@ -20,6 +15,7 @@ var uuid = require('uuid');
 var shortId = require('shortid');
 var uaParser = require('ua-parser-js');
 
+var dbUrl = process.env.FACILCOPY_DB_URL;
 var MongoClient = require('mongodb').MongoClient;
 var mongoDbObj;
 var assert = require('assert');
