@@ -4,7 +4,7 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 	if (true) {
 		var serverURL = "https://facilcopy.herokuapp.com";
 	} else {	
-		var serverURL = "http://localhost:3333";
+		var serverURL = "http://192.168.88.3:3333";
 	}
 	$scope.devicelist = "Just you";
 
@@ -26,6 +26,7 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 
 		// Modal-
 	$scope.modal = function(){
+		// $('#reader').html5_qrcode_stop();
 		var timeout;
 		var isHidden = false;
 		el = document.getElementById('modal');
@@ -61,12 +62,12 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 		$('#scan-modal').toggleClass('notVisible');
 		$('#reader').html5_qrcode(function(data){
 			$scope.modal();
+			joinToRoomFromQr(data);
 			$('#reader').html5_qrcode_stop();
-			socketStarter(data);
 		}, function(error){
-			flashMessage(error);
+			// flashMessage(error);
 		}, function(videoError){
-			flashMessage(videoError)
+			// flashMessage(videoError)
 		});
 	}
 	
@@ -123,7 +124,6 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
   		var uuid = data.target.responseText;
   	else
   		var uuid = data;
-  	console.log("socketStarter Else");
   	window.localStorage.setItem('room', uuid);
   	// socketp2p = io('http://192.168.88.219:3333');
   	var deviceId = localStorage.getItem('device-id');
@@ -134,6 +134,23 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 	  		desp: 'desktop', 
 	  		deviceId: deviceId
 	  	});
+  	});
+  }
+
+  function joinToRoomFromQr(data){
+  	console.log("joinToRoomFromQr");
+  	if (typeof(data) == 'object')
+  		var uuid = data.target.responseText;
+  	else
+  		var uuid = data;
+  	window.localStorage.setItem('room', uuid);
+  	// socketp2p = io('http://192.168.88.219:3333');
+  	var deviceId = localStorage.getItem('device-id');
+  	socketp2p.emit('leave-default-room', {});
+  	socketp2p.emit('joinmeto', {
+  		room: uuid, 
+  		desp: 'desktop', 
+  		deviceId: deviceId
   	});
   }
 
