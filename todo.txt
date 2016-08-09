@@ -1,3 +1,7 @@
 - Crear una funcion para obtener status cuando la APP sea visible nuevamente (En Movil)
 
 - Transferencia de archivos
+
+- Agregar loading status cuando este escaneando QR
+
+- Agregar identificador numerico? al final de el nombre del dispositivo en devicelist

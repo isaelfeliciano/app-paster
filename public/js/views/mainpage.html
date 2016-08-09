@@ -1,11 +1,20 @@
 <div class="main-container">
 	<header>
-		<h2>Simplicopi</h2>
+		<button class="btn-nav" ng-click="showNav()"><i class="fa fa-2x">&#xf0c9;</i></button>
+        <button class="btn-devicelist" ng-click="openDeviceList()" ng-data="devicelist">Devices: {{ devicelist }}</button>  
 	</header>
-	<a href="javascript:void(0)" ng-click="openDeviceList()">
-  <div id="btn-dropdown" class="dropdown-container center-align center-text" ng-data="devicelist">
-    <span>Devices: {{ devicelist }} <i class="fa fa-chevron-right"></i></span>
-  </div></a>
+  
+  <nav>
+    <button class="nav__btn nav__btn--plus center-align" ng-click="modal()"><i class="fa fa-3x">&#xf067;</i></button>
+    
+    <button class="nav__btn nav__btn--search center-align" ng-click="searchMessage()"><i class="fa fa-3x">&#xf002;</i></button>
+    
+    <button class="nav__btn nav__btn--settings center-align" ng-click="appSettings()"><i class="fa fa-3x">&#xf013;</i></button>
+    
+    <button class="nav__btn nav__btn--leave-room center-align" ng-click="leaveRoom()"><i class="fa fa-3x">&#xf08b;</i></button>
+    
+    <button class="nav__btn nav__btn--about center-align-absolute" ng-click="about()"><i class="fa fa-3x">&#xf129;</i></button>
+  </nav>
 
   <div class="device-list device-list--hide center-align">
   	<button class="btn btn--round" ng-click="openDeviceList()"><i class="fa fa-2x fa-close"></i></button>
@@ -14,7 +23,7 @@
   	</ul>
   </div>
 
-	<div class="layout-container">
+	<div class="layout-container center-text center-align">
 		<div class="layout-message notVisible">
           <span class="sender">{{ sender }}</span>
 			<p id="text-received" class="message center-align box-radius">
@@ -23,20 +32,18 @@
 		</div>
 
 		<div class="layout-textarea">
-			<textarea  class="autoExpand center-align-absolute" name="textarea" rows="1" data-min-rows='1' placeholder="Type some text here"></textarea>
-		</div>
-
-		<div class="layout-3btns center-text">
+			<textarea  class="autoExpand" name="textarea" rows="1" data-min-rows='1' placeholder="Type some text here"></textarea>
+          
+          <div class="layout-2btns">
 			<button class="btn btn--round" ng-click="sendTextToRoom()">
 				<i class="fa fa-2x">&#xf1d8;</i>
 			</button>
 			<button class="btn btn--round">
 				<i class="fa fa-2x">&#xf0c6;</i>
 			</button>
-			<button class="btn btn--round" ng-click="modal()">
-				<i class="fa fa-2x">&#xf067;</i>
-			</button>
 		</div>
+		</div>
+
 
 		<div id="modal" class="modal-container center-align center-text">
 		  <div id="open-modal" class="modal-dialog box-shadow center">

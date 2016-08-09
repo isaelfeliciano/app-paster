@@ -37,8 +37,13 @@ Bright Turquoise (buttons): #27FFEF;
 
 /* ---- HELPERS ----<<<<*/
 
+html {
+  height: 100%;
+}
+
 body{
-	background: #08327D;
+  background: #08327D;
+  min-height: 100%;
 }
 
 header{
@@ -46,26 +51,66 @@ header{
 	height: 3em;
 	
     color: #fff;
-	display: block;
+    position: fixed;
 	background: #04193F;
+    z-index: 8;
 }
+
+header .btn-nav {
+  background-color: transparent;
+  color: #FFF;
+  border: none;
+  padding: 1em 2.1em;
+}
+
+nav {
+  background-color: #0C0D05;
+  width: 5em;
+  left: 0;
+  height: 100%;
+  position: fixed;
+  padding-top: 3em;
+  z-index: 7
+}
+nav .nav__btn {
+  display: block;
+  color: #27FFEF;
+  border: none;
+  background-color: transparent;
+  padding-top: 1em;
+}
+
+.nav__btn--about {
+  position: absolute;
+  bottom: 0%;
+  margin-bottom: 5em;
+  width: 5em;
+}
+
+nav .showWithMediaQ {
+  left: 0;
+}
+
 
 img{
   max-width: 100%;
   max-height: 100%;
 }
 
-textarea{color: white;
+textarea {
+  display: inline;
   position: absolute;
-  bottom: 0;
-  display: block; 
-/*  overflow: invisible; */
+  bottom: 0; 
+  left: 0;
+  margin-left: 1em;
+  
+  color: white;
   resize: none; 
-  text-align: center;
   height: auto; 
   min-height: auto;
-  max-height: 75%;
-  width: 100%;
+  max-height: 100%;
+  width: 70%;
+/*  max-width: 30em;*/
   font-size: 1.5em; 
   
   background-color: #08327d;  
@@ -78,10 +123,16 @@ textarea{color: white;
   border: 1px solid white;
 }*/
 
+.main-container {
+  height: 100%;
+  width: 100%;
+}
+
 .layout-container{
 	width: 100%;
-	padding-left: 0.5em;
-	padding-right: 0.5em;
+    padding: 3em 0 3em 5em;
+    height: 100%;
+    position: absolute;
 }
 
 .sender{
@@ -92,9 +143,7 @@ textarea{color: white;
 
 .layout-message{
 	width: 100%;
-	height: 30%;
-	
-	display: block;
+	height: 60%;
 }
 .layout-message .message{
 	width: 100%;
@@ -106,13 +155,19 @@ textarea{color: white;
 }
 
 .layout-textarea{
+  width: 100%;
+  height: 40%;
   position: relative;
-	width: inherit;
-  height: 10em;
 }
 
-.layout-3btns{
-  margin-top: 3em;
+.layout-2btns{
+  display: block;
+  position: absolute;
+  bottom: 0;
+  margin-left: 3em;
+  left: 70%;
+  
+  
 }
 
 .device-list {
@@ -121,7 +176,7 @@ textarea{color: white;
   height: 100%;
   width: 80%;
   max-width: 400px;
-  z-index: 999999;
+  z-index: 10;
   background-color: #0C0D05;
   
   -webkit-box-shadow: -9px 0px 16px -6px rgba(0,0,0,0.75);
@@ -187,6 +242,19 @@ textarea{color: white;
   text-decoration: none;
   border-radius: 5px;
   z-index: 10000;
+}
+
+.btn-devicelist {
+  border: 2px solid #27FFEF;
+  padding: 0.5em;
+  border-radius: 5px;
+  background-color: transparent;
+  color: #FFF;
+  float: right;
+  margin-right: 1em;
+  font-size: 1em;
+  position: relative;
+  bottom: -0.3em
 }
 
 .input-decoration
@@ -283,6 +351,7 @@ textarea{color: white;
 
 /*Flashmessge*/
 .flashmessage{
+  left: 5em;
   position: absolute;
   top: 4em;
   width: 80%;
@@ -382,4 +451,22 @@ textarea{color: white;
 /*  position: absolute;*/
 /*  right: -1.5em;*/
 }
-/*----Dropdown
+
+@media (min-width: 320px) {
+  nav {
+    visibility: hidden;
+  }
+  
+  .layout-container {
+    padding: 3em 0 1em 0;
+  }
+}
+
+@media (min-width: 540px) {
+  nav {
+    visibility: visible;
+  }
+  .layout-container {
+    padding: 3em 0 3em 5em;
+  }
+}

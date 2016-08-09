@@ -19,7 +19,7 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 			var minRows = this.getAttribute('data-min-rows')|0,
 				 rows;
 			this.rows = minRows;
-        console.log(this.scrollHeight , this.baseScrollHeight);
+      // console.log(this.scrollHeight , this.baseScrollHeight);
 			rows = Math.ceil((this.scrollHeight - this.baseScrollHeight) / 33);
 			this.rows = minRows + rows;
 		});
@@ -125,7 +125,6 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
   	else
   		var uuid = data;
   	window.localStorage.setItem('room', uuid);
-  	// socketp2p = io('http://192.168.88.219:3333');
   	var deviceId = localStorage.getItem('device-id');
   	socketOn(function(deviceId) {
 	  	socketp2p.emit('leave-default-room', {});
@@ -144,7 +143,6 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
   	else
   		var uuid = data;
   	window.localStorage.setItem('room', uuid);
-  	// socketp2p = io('http://192.168.88.219:3333');
   	var deviceId = localStorage.getItem('device-id');
   	socketp2p.emit('leave-default-room', {});
   	socketp2p.emit('joinmeto', {
@@ -157,6 +155,15 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
   $scope.openDeviceList = function() {
   	$('.device-list').toggleClass('device-list--hide')
   		.toggleClass('device-list--visible');
+  }
+
+  $scope.showNav = function() {
+  	$('nav').toggle(function() {
+  		$('nav').css("visibility", "hidden");
+  	}, function() {
+  		$('nav').css("visibility", "visible");
+  	});
+
   }
 
   $scope.sendTextToRoom = function(){
