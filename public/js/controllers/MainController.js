@@ -104,7 +104,6 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 
 	var list = document.getElementById('log-list');
 	var localStorage = window.localStorage;
-	$(document).foundation();
 
   if (window.localStorage.getItem('room')){
 		var room = window.localStorage.getItem('room');
@@ -169,6 +168,11 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
   $scope.sendTextToRoom = function(){
   	var text = document.getElementsByName('textarea')[0].value;
   	$('textarea').val('');
+  	$('.middle-content__messages').append(`
+  		<div class="message-from-me">
+  			<p class="box-radius">${text}</p>
+  		</div>
+  		`);
   	// var room = document.cookie.replace(/(?:(?:^|.*;\s*)room\s*\=\s*([^;]*).*$)|^.*$/, "$1");
   	var room = getRoom();
   	socketp2p.emit('to-room', {room: room, text: text, id: getDeviceId()});
@@ -227,10 +231,14 @@ app.controller('MainController', ['$scope', '$http', '$window', function ($scope
 			console.log('Event: reconnect_failed');
 		});
 	  socketp2p.on('message', function(data){
-	  	document.getElementById('text-received').innerHTML = data.msg;
-	  	$scope.sender = data.sender;
-	  	$scope.$apply();
-	  	$('.layout-message').removeClass('notVisible');
+	  	// document.getElementById('text-received').innerHTML = data.msg;
+	  	// $scope.sender = data.sender;
+	  	// $scope.$apply();
+	  	$('.middle-content__messages').append(`
+	  		<div class="message-from-others">
+		  		<p class="box-radius">${data.msg}</p>
+		  	</div>	
+	  		`);
 	  });
 	  socketp2p.on('reconnect', function(){
 	  	/*socketp2p.emit('leave-default-room', {});

@@ -23,18 +23,15 @@
   	</ul>
   </div>
 
-	<div class="layout-container center-text center-align">
-		<div class="layout-message notVisible">
-          <span class="sender">{{ sender }}</span>
-			<p id="text-received" class="message center-align box-radius">
-              Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-          </p> 
+	<div class="middle-content">
+		<div class="middle-content__messages">
+		<!-- APPEND MESSAGES HERE -->
 		</div>
 
-		<div class="layout-textarea">
+		<div class="middle-content__text-input">
 			<textarea  class="autoExpand" name="textarea" rows="1" data-min-rows='1' placeholder="Type some text here"></textarea>
           
-          <div class="layout-2btns">
+          <div class="middle-content__text-input__btns">
 			<button class="btn btn--round" ng-click="sendTextToRoom()">
 				<i class="fa fa-2x">&#xf1d8;</i>
 			</button>
