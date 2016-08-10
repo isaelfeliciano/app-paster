@@ -2,12 +2,12 @@ node_modules
 npm-debug.log
 logs/*.log
 git-info.txt 
-cert-file.crt
+/cert-file.crt
 certrequest.csr
 remotepaster-cert.pem
 remotepaster-key.pem
 new-style
-*~
-*.crt
+/*~
+/*.crt
 public/index.js
 socket-output
